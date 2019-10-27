@@ -9,11 +9,9 @@ const index = require('./routes/index');
 
 const app = express();
 
-// view engine setup
 app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'ejs');
+app.set('view engine', 'jade');
 
-// TODO: Add favicon.ico to /public and uncomment.
 app.use(favicon(path.join(__dirname, 'public/assets', 'favicon.ico')));
 app.use(logger('dev'));
 app.use(bodyParser.json());
@@ -34,17 +32,12 @@ app.use((req, res, next) => {
 
 // Error handler.
 app.use((err, req, res) => {
-  // Set locals.
-  // Only provide error in development.
+  // Set locals, only providing error in development.
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
 
   // Render the error page.
   res.status(err.status || 500).send(err);
-});
-
-app.listen('8081', () => {
-  console.log('Server running on port 8081');
 });
 
 module.exports = app;
