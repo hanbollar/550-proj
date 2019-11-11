@@ -7,11 +7,23 @@ const app = angular.module('angularjsNodejsTutorial', []);
 // For unknown reasons, Angular breaks if an arrow callback is used here.
 app.controller('cardsController', function ($scope, $http) {
   $http({
-    url: '/countries',
+    url: '/countryTuples',
     method: 'GET',
   }).then((res) => {
     $scope.countries = res.data;
   }, (err) => {
     console.log('[!] Cards controller: ', err);
+  });
+});
+
+// For unknown reasons, Angular breaks if an arrow callback is used here.
+app.controller('indicatorsController', function ($scope, $http) {
+  $http({
+    url: '/indicatorTuples',
+    method: 'GET',
+  }).then((res) => {
+    $scope.indicators = res.data;
+  }, (err) => {
+    console.log('[!] Indicators controller: ', err);
   });
 });

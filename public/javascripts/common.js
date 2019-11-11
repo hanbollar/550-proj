@@ -1,5 +1,6 @@
 /* global document */
 
+// eslint-disable-next-line no-unused-vars
 function populateNavBar() {
   const nav = document.getElementById('nav');
   nav.className = 'navbar navbar-expand-lg navbar-light bg-light';
@@ -23,6 +24,12 @@ function populateNavBar() {
   about.href = '/about';
   about.innerHTML = 'About';
   innerContainer.appendChild(about);
+
+  const indicators = document.createElement('a');
+  about.className = 'nav-item nav-link';
+  about.href = '/indicators';
+  about.innerHTML = 'Indicators';
+  innerContainer.appendChild(indicators);
 
   const cards = document.createElement('a');
   cards.className = 'nav-item nav-link';
