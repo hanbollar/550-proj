@@ -52,4 +52,16 @@ router.get('/indicatorTuples', (req, res) => {
   });
 });
 
+router.get('/graphTuples', (req, res) => {
+  const query = `SELECT *
+  FROM Indicators;`;
+
+  connection.query(query, (err, rows) => {
+    if (err) console.log(`[!] /graphTuples route: ${err}`);
+    else {
+      res.json(rows);
+    }
+  });
+});
+
 module.exports = router;

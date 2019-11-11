@@ -27,3 +27,15 @@ app.controller('indicatorsController', function ($scope, $http) {
     console.log('[!] Indicators controller: ', err);
   });
 });
+
+// For unknown reasons, Angular breaks if an arrow callback is used here.
+app.controller('graphController', function ($scope, $http) {
+  $http({
+    url: '/graphTuples',
+    method: 'GET',
+  }).then((res) => {
+    $scope.indicators = res.data;
+  }, (err) => {
+    console.log('[!] Graph controller: ', err);
+  });
+});
