@@ -44,7 +44,7 @@ function populateNavBar() {
   innerContainer.appendChild(graphs);
 }
 
-async function getCountryTuples(event) {
+async function getCountryTuples() {
   fetch('/countryTuples',
     {
       method: 'GET',
@@ -70,6 +70,7 @@ async function getIndicatorTuples() {
     .then((json) => console.log(json));
 }
 
+// TODO: Un-hardcode the req body data.
 async function getCardTuples() {
   const indicator = 'ny_gdp_mktp_kd';
   const minYear = '1970';
@@ -92,6 +93,7 @@ async function getCardTuples() {
     .then((json) => console.log(json));
 }
 
+// TODO: Un-hardcode the req body data.
 async function getGraphTuples() {
   const indicator = 'ny_gdp_mktp_kd';
   const countryNames = ['China', 'Armenia'];
@@ -116,6 +118,7 @@ async function getGraphTuples() {
     .then((json) => console.log(json));
 }
 
+// TODO: Un-hardcode the req body data.
 async function getYoyTuples() {
   const indicator = 'ny_gdp_mktp_kd';
 
@@ -134,6 +137,7 @@ async function getYoyTuples() {
     .then((json) => console.log(json));
 }
 
+// TODO: Un-hardcode the req body data.
 async function getYoyPairTuples() {
   const indicatorNumerator = 'ny_gdp_mktp_kd';
   const indicatorDenominator = 'ny_gnp_mktp_kd';
@@ -154,6 +158,7 @@ async function getYoyPairTuples() {
     .then((json) => console.log(json));
 }
 
+// TODO: Un-hardcode the req body data.
 async function getCompletenessTuples() {
   const indicator = 'ny_gdp_mktp_kd';
   const countryNames = ['China', 'Armenia'];
