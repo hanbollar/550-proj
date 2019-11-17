@@ -1,6 +1,6 @@
-/* global document */
+/* eslint-disable no-unused-vars */
+/* global document fetch */
 
-// eslint-disable-next-line no-unused-vars
 function populateNavBar() {
   const nav = document.getElementById('nav');
   nav.className = 'navbar navbar-expand-lg navbar-light bg-light';
@@ -42,4 +42,138 @@ function populateNavBar() {
   graphs.href = '/graphs';
   graphs.innerHTML = 'Country Graphs';
   innerContainer.appendChild(graphs);
+}
+
+async function getCountryTuples(event) {
+  fetch('/countryTuples',
+    {
+      method: 'GET',
+      headers: {
+        'Content-type': 'application/json; charset=UTF-8',
+        Accept: 'application/json; charset=UTF-8',
+      },
+    })
+    .then((res) => res.json())
+    .then((json) => console.log(json));
+}
+
+async function getIndicatorTuples() {
+  fetch('/indicatorTuples',
+    {
+      method: 'GET',
+      headers: {
+        'Content-type': 'application/json; charset=UTF-8',
+        Accept: 'application/json; charset=UTF-8',
+      },
+    })
+    .then((res) => res.json())
+    .then((json) => console.log(json));
+}
+
+async function getCardTuples() {
+  const indicator = 'ny_gdp_mktp_kd';
+  const minYear = '1970';
+  const maxYear = '2010';
+
+  fetch('/cardTuples',
+    {
+      method: 'POST',
+      body: JSON.stringify({
+        indicator,
+        minYear,
+        maxYear,
+      }),
+      headers: {
+        'Content-type': 'application/json; charset=UTF-8',
+        Accept: 'application/json; charset=UTF-8',
+      },
+    })
+    .then((res) => res.json())
+    .then((json) => console.log(json));
+}
+
+async function getGraphTuples() {
+  const indicator = 'ny_gdp_mktp_kd';
+  const countryNames = ['China', 'Armenia'];
+  const minYear = '1970';
+  const maxYear = '2010';
+
+  fetch('/graphTuples',
+    {
+      method: 'POST',
+      body: JSON.stringify({
+        indicator,
+        countryNames,
+        minYear,
+        maxYear,
+      }),
+      headers: {
+        'Content-type': 'application/json; charset=UTF-8',
+        Accept: 'application/json; charset=UTF-8',
+      },
+    })
+    .then((res) => res.json())
+    .then((json) => console.log(json));
+}
+
+async function getYoyTuples() {
+  const indicator = 'ny_gdp_mktp_kd';
+
+  fetch('/yoyTuples',
+    {
+      method: 'POST',
+      body: JSON.stringify({
+        indicator,
+      }),
+      headers: {
+        'Content-type': 'application/json; charset=UTF-8',
+        Accept: 'application/json; charset=UTF-8',
+      },
+    })
+    .then((res) => res.json())
+    .then((json) => console.log(json));
+}
+
+async function getYoyPairTuples() {
+  const indicatorNumerator = 'ny_gdp_mktp_kd';
+  const indicatorDenominator = 'ny_gnp_mktp_kd';
+
+  fetch('/yoyPairTuples',
+    {
+      method: 'POST',
+      body: JSON.stringify({
+        indicatorNumerator,
+        indicatorDenominator,
+      }),
+      headers: {
+        'Content-type': 'application/json; charset=UTF-8',
+        Accept: 'application/json; charset=UTF-8',
+      },
+    })
+    .then((res) => res.json())
+    .then((json) => console.log(json));
+}
+
+async function getCompletenessTuples() {
+  const indicator = 'ny_gdp_mktp_kd';
+  const countryNames = ['China', 'Armenia'];
+  const minYear = '1970';
+  const maxYear = '2010';
+
+  fetch('/completenessTuples',
+    {
+      method: 'POST',
+      body: JSON.stringify({
+        indicator,
+        countryNames,
+        minYear,
+        maxYear,
+      }),
+      headers: {
+        'Content-type': 'application/json; charset=UTF-8',
+        Accept: 'application/json; charset=UTF-8',
+      },
+    })
+    .then((res) => res.json())
+    .then((json) => console.log(json));
 }
