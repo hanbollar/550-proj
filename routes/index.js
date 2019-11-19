@@ -58,16 +58,15 @@ router.get('/indicatorTuples', (req, res) => {
   });
 });
 
-// TODO: Convert to a GET route.
-router.post('/cardTuples', (req, res) => {
+router.get('/cardTuples/:indicator/:minYear/:maxYear', (req, res) => {
   const query = `
     WITH values_for_countries AS (
       SELECT    i.cid,
                 i.year,
                 i.value
-      FROM      ${req.body.indicator} i
-      WHERE     i.year >= ${req.body.minYear}
-      AND       i.year <= ${req.body.maxYear} ),
+      FROM      ${req.params.indicator} i
+      WHERE     i.year >= ${req.params.minYear}
+      AND       i.year <= ${req.params.maxYear} ),
     start_values_per_country AS (
       SELECT    vfc1.cid,
                 vfc1.year,

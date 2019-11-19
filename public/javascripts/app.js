@@ -7,10 +7,14 @@ const app = angular.module('angularjsNodejsTutorial', []);
 // TODO: Fix these controllers.
 
 // For unknown reasons, Angular breaks if an arrow callback is used here.
-app.controller('cardsController', function ($scope, $http) {
+app.controller('cardsController', function ($scope, $http, $attrs) {
+  if (!$attrs.indicator) throw new Error('[!] cardsController missing argument: indicator');
+  if (!$attrs.minyear) throw new Error('[!] cardsController missing argument: minYear');
+  if (!$attrs.maxyear) throw new Error('[!] cardsController missing argument: maxYear');
+
   $http({
-    url: '/cardTuples',
-    method: 'POST',
+    url: `/cardTuples/${$attrs.indicator}/${$attrs.minyear}/${$attrs.maxyear}`,
+    method: 'GET',
   }).then((res) => {
     $scope.countries = res.data;
   }, (err) => {
@@ -38,6 +42,6 @@ app.controller('graphsController', function ($scope, $http) {
   }).then((res) => {
     $scope.indicators = res.data;
   }, (err) => {
-    console.log('[!] Graph controller: ', err);
+    console.log('[!] Graphs controller: ', err);
   });
 });
