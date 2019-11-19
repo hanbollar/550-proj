@@ -16,16 +16,16 @@ router.get('/about', (req, res) => {
   res.sendFile(path.join(__dirname, '../', 'views', 'about.html'));
 });
 
-router.get('/indicators', (req, res) => {
-  res.sendFile(path.join(__dirname, '../', 'views', 'indicators.html'));
-});
-
 router.get('/cards', (req, res) => {
   res.sendFile(path.join(__dirname, '../', 'views', 'cards.html'));
 });
 
 router.get('/graphs', (req, res) => {
   res.sendFile(path.join(__dirname, '../', 'views', 'graphs.html'));
+});
+
+router.get('/facts', (req, res) => {
+  res.sendFile(path.join(__dirname, '../', 'views', 'facts.html'));
 });
 
 router.get('/countryTuples', (req, res) => {

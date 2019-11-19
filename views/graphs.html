@@ -17,22 +17,12 @@
     <link href="/stylesheets/cards.css" rel="stylesheet">
   </head>
 
-  <body onload="populateNavBar();"  ng-controller="indicatorsController">
+  <body onload="populateNavBar();"  ng-controller="graphsController">
     <nav id="nav"></nav>
 
     <div id="tester" style="width:600px;height:250px;"></div>
 
     <script src="javascripts/graphs.js" type="text/javascript"></script>
-
-    <div class="outer-container">
-      <div class="inner-container">
-          <div class="outer-box" ng-repeat="i in indicators" id="{{'button-' + i.name}}">
-              <div class="inner-box">
-                <input class="indicator" type="checkbox" value="{{i.name}}"> {{i.name}}
-              </div>
-            </div>
-      </div>
-    </div>
 
     <!-- Include these before the end of body tag in every HTML file -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>

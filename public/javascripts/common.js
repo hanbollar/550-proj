@@ -25,12 +25,6 @@ function populateNavBar() {
   about.innerHTML = 'About';
   innerContainer.appendChild(about);
 
-  const indicators = document.createElement('a');
-  about.className = 'nav-item nav-link';
-  about.href = '/indicators';
-  about.innerHTML = 'Indicators';
-  innerContainer.appendChild(indicators);
-
   const cards = document.createElement('a');
   cards.className = 'nav-item nav-link';
   cards.href = '/cards';
@@ -42,6 +36,12 @@ function populateNavBar() {
   graphs.href = '/graphs';
   graphs.innerHTML = 'Country Graphs';
   innerContainer.appendChild(graphs);
+
+  const facts = document.createElement('a');
+  facts.className = 'nav-item nav-link';
+  facts.href = '/facts';
+  facts.innerHTML = 'Country Facts';
+  innerContainer.appendChild(facts);
 }
 
 async function getCountryTuples() {

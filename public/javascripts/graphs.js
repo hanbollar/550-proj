@@ -1,8 +1,11 @@
+/* globals document Plotly TESTER */
+
+// eslint-disable-next-line no-global-assign
 TESTER = document.getElementById('tester');
 
-Plotly.plot( TESTER, [{
-    x: [1, 2, 3, 4, 5],
-    y: [1, 2, 4, 8, 16] }], { 
-    margin: { t: 0 } }, {showSendToCloud:true} );
+Plotly.plot(TESTER, [{
+  x: [1, 2, 3, 4, 5],
+  y: [1, 2, 4, 8, 16],
+}], { margin: { t: 0 } }, { showSendToCloud: true });
 /* Current Plotly.js version */
-console.log( Plotly.BUILD );
+console.log(Plotly.BUILD);

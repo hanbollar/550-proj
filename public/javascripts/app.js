@@ -4,11 +4,13 @@
 
 const app = angular.module('angularjsNodejsTutorial', []);
 
+// TODO: Fix these controllers.
+
 // For unknown reasons, Angular breaks if an arrow callback is used here.
 app.controller('cardsController', function ($scope, $http) {
   $http({
-    url: '/countryTuples',
-    method: 'GET',
+    url: '/cardTuples',
+    method: 'POST',
   }).then((res) => {
     $scope.countries = res.data;
   }, (err) => {
@@ -29,10 +31,10 @@ app.controller('indicatorsController', function ($scope, $http) {
 });
 
 // For unknown reasons, Angular breaks if an arrow callback is used here.
-app.controller('graphController', function ($scope, $http) {
+app.controller('graphsController', function ($scope, $http) {
   $http({
     url: '/graphTuples',
-    method: 'GET',
+    method: 'POST',
   }).then((res) => {
     $scope.indicators = res.data;
   }, (err) => {

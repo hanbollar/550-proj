@@ -21,7 +21,8 @@
       <div class="inner-container">
         <div class="outer-box" ng-repeat="c in countries" id="{{'button-' + c.name}}">
           <div class="inner-box">
-            {{c.name}}
+            {{c.name}}<br />
+            {{c.percentage_change}}
           </div>
         </div>
       </div>
