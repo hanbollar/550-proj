@@ -18,19 +18,35 @@
   <body onload="populateNavBar();">
     <nav id="nav"></nav>
 
-    <select ng-controller="indicatorsController" name="indicators" class="dropdown">
-      <option value="">Select an indicator...</option>
-      <option ng-repeat="i in indicators" value="{{i.name}}">{{i.name}}</option>
-    </select>
+    <!-- TODO: Don't run the indicators query multiple times. -->
 
-    <div ng-controller="yoyController" ng-model="yoys" indicator="ny_gdp_mktp_kd">
+    <div ng-controller="yoyController" ng-model="yoys" indicator="ny_gdp_mktp_kd" class="fact-box">
+      <select ng-controller="indicatorsController" name="indicators" class="dropdown">
+        <option value="">Select an indicator...</option>
+        <option ng-repeat="i in indicators" value="{{i.name}}">{{i.name}}</option>
+      </select>
+
+      Greatest year-over-year change for the selected indicator:<br/>
+      <br/>
       {{yoys[0].name}}<br />
       {{yoys[0].percentage_change}}<br />
       {{yoys[0].start_year}}<br />
       {{yoys[0].end_year}}<br />
     </div>
 
-    <div ng-controller="yoyPairController" ng-model="yoyPairs" indicator_numerator="ny_gdp_mktp_kd" indicator_denominator="ny_gnp_mktp_kd">
+    <div ng-controller="yoyPairController" ng-model="yoyPairs" indicator_numerator="ny_gdp_mktp_kd" indicator_denominator="ny_gnp_mktp_kd" class="fact-box">
+      <select ng-controller="indicatorsController" name="indicators" class="dropdown">
+        <option value="">Select an indicator as the numerator...</option>
+        <option ng-repeat="i in indicators" value="{{i.name}}">{{i.name}}</option>
+      </select>
+
+      <select ng-controller="indicatorsController" name="indicators" class="dropdown">
+        <option value="">Select an indicator as the denominator...</option>
+        <option ng-repeat="i in indicators" value="{{i.name}}">{{i.name}}</option>
+      </select>
+
+      Greatest year-over-year ratio change for the selected indicators:<br/>
+      <br/>
       {{yoyPairs[0].name}}<br />
       {{yoyPairs[0].percentage_change}}<br />
       {{yoyPairs[0].start_year}}<br />
