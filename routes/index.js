@@ -148,23 +148,26 @@ router.post('/graphTuples', (req, res) => {
 });
 
 // TODO: Convert to a GET route.
-router.post('/yoyTuples', (req, res) => {
+router.get('/yoyTuples/:yoyIndicator', (req, res) => {
   const query = `
     WITH year_over_year_changes AS (
       SELECT  istart.cid,
               istart.year                                      AS start_year,
               iend.year                                        AS end_year,
               ((iend.value - istart.value) / istart.value)     AS percentage_change
-      FROM    ${req.body.indicator} istart
-      JOIN    ${req.body.indicator} iend
+      FROM    ${req.params.yoyIndicator} istart
+      JOIN    ${req.params.yoyIndicator} iend
       ON      iend.cid = istart.cid
       WHERE   iend.year = istart.year + 1 )
-    SELECT    yoyc.cid,                               
+    SELECT    yoyc.cid,
               yoyc.start_year,
               yoyc.end_year,
               max(yoyc.percentage_change) AS percentage_change
     FROM      year_over_year_changes yoyc
-    GROUP BY  yoyc.cid,
+    JOIN      Country c
+    ON        c.cid = i.cid
+    GROUP BY  c.name,
+              yoyc.percentage_change,
               yoyc.start_year,
               yoyc.end_year;`;
 

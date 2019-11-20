@@ -15,12 +15,12 @@
   </head>
 
   <!-- TODO: Un-hardcode the values of indicator, minyear, and maxyear. -->
-  <body onload="populateNavBar();" ng-controller="cardsController" indicator="ny_gdp_mktp_kd" minyear="1970" maxyear="2010">
+  <body onload="populateNavBar();" ng-controller="cardsController" indicator="ny_gdp_mktp_kd" min_year="1970" max_year="2010">
     <nav id="nav"></nav>
 
     <div class="outer-container">
       <div class="inner-container">
-        <div class="outer-box" ng-repeat="c in countries" id="{{'country-' + c.name}}">
+        <div class="outer-box" ng-repeat="c in countries">
           <div class="inner-box">
             {{c.name}}<br />
             {{c.percentage_change}}

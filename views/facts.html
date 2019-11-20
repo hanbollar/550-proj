@@ -14,13 +14,27 @@
     <link href="/stylesheets/facts.css" rel="stylesheet">
   </head>
 
-  <body onload="populateNavBar();" ng-controller="indicatorsController">
+  <!-- TODO: Un-hardcode the indicator value. -->
+  <body onload="populateNavBar();" ng-controller="factsController" yoy_indicator="ny_gdp_mktp_kd">
     <nav id="nav"></nav>
 
     <select name="indicators" class="dropdown">
       <option value="">Select an indicator...</option>
-      <option ng-repeat="i in indicators" value="{{'button-' + i.name}}">{{i.name}}</option>
+      <option ng-repeat="i in indicators" value="{{i.name}}">{{i.name}}</option>
     </select>
+
+    <div class="outer-container">
+      <div class="inner-container">
+        <div class="outer-box" ng-repeat="c in countries">
+          <div class="inner-box">
+            {{c.name}}<br />
+            {{c.percentage_change}}<br />
+            {{c.start_year}}<br />
+            {{c.end_year}}
+          </div>
+        </div>
+      </div>
+    </div>
 
     <!-- Include these before the end of body tag in every HTML file -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
