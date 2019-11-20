@@ -15,25 +15,26 @@
   </head>
 
   <!-- TODO: Un-hardcode the indicator value. -->
-  <body onload="populateNavBar();" ng-controller="factsController" yoy_indicator="ny_gdp_mktp_kd">
+  <body onload="populateNavBar();">
     <nav id="nav"></nav>
 
-    <select name="indicators" class="dropdown">
+    <select ng-controller="indicatorsController" name="indicators" class="dropdown">
       <option value="">Select an indicator...</option>
       <option ng-repeat="i in indicators" value="{{i.name}}">{{i.name}}</option>
     </select>
 
-    <div class="outer-container">
-      <div class="inner-container">
-        <div class="outer-box" ng-repeat="c in countries">
-          <div class="inner-box">
-            {{c.name}}<br />
-            {{c.percentage_change}}<br />
-            {{c.start_year}}<br />
-            {{c.end_year}}
-          </div>
-        </div>
-      </div>
+    <div ng-controller="yoyController" ng-model="yoys" indicator="ny_gdp_mktp_kd">
+      {{yoys[0].name}}<br />
+      {{yoys[0].percentage_change}}<br />
+      {{yoys[0].start_year}}<br />
+      {{yoys[0].end_year}}<br />
+    </div>
+
+    <div ng-controller="yoyPairController" ng-model="yoyPairs" indicator_numerator="ny_gdp_mktp_kd" indicator_denominator="ny_gnp_mktp_kd">
+      {{yoyPairs[0].name}}<br />
+      {{yoyPairs[0].percentage_change}}<br />
+      {{yoyPairs[0].start_year}}<br />
+      {{yoyPairs[0].end_year}}<br />
     </div>
 
     <!-- Include these before the end of body tag in every HTML file -->

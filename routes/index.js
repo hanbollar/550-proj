@@ -33,8 +33,6 @@ router.get('/countryTuples', (req, res) => {
     SELECT *
     FROM Country;`;
 
-  console.log(query);
-
   connection.query(query, (err, rows) => {
     if (err) console.log(`[!] /countryTuples route: ${err}`);
     else {
@@ -47,8 +45,6 @@ router.get('/indicatorTuples', (req, res) => {
   const query = `
     SELECT *
     FROM Indicators;`;
-
-  console.log(query);
 
   connection.query(query, (err, rows) => {
     if (err) console.log(`[!] /indicatorTuples route: ${err}`);
@@ -100,8 +96,6 @@ router.get('/cardTuples/:indicator/:minYear/:maxYear', (req, res) => {
     ON       c.cid = cpc.cid
     ORDER BY cpc.percentage_change DESC;`;
 
-  console.log(query);
-
   connection.query(query, (err, rows) => {
     if (err) console.log(`[!] /cardTuples route: ${err}`);
     else {
@@ -137,8 +131,6 @@ router.post('/graphTuples', (req, res) => {
     AND       i.year <= ${req.body.maxYear}
     ORDER BY  c.name, i.year;`;
 
-  console.log(query);
-
   connection.query(query, (err, rows) => {
     if (err) console.log(`[!] /graphTuples route: ${err}`);
     else {
@@ -148,30 +140,29 @@ router.post('/graphTuples', (req, res) => {
 });
 
 // TODO: Convert to a GET route.
-router.get('/yoyTuples/:yoyIndicator', (req, res) => {
+router.get('/yoyTuples/:indicator', (req, res) => {
   const query = `
     WITH year_over_year_changes AS (
       SELECT  istart.cid,
               istart.year                                      AS start_year,
               iend.year                                        AS end_year,
               ((iend.value - istart.value) / istart.value)     AS percentage_change
-      FROM    ${req.params.yoyIndicator} istart
-      JOIN    ${req.params.yoyIndicator} iend
+      FROM    ${req.params.indicator} istart
+      JOIN    ${req.params.indicator} iend
       ON      iend.cid = istart.cid
       WHERE   iend.year = istart.year + 1 )
-    SELECT    yoyc.cid,
+    SELECT    c.name,
               yoyc.start_year,
               yoyc.end_year,
               max(yoyc.percentage_change) AS percentage_change
     FROM      year_over_year_changes yoyc
     JOIN      Country c
-    ON        c.cid = i.cid
-    GROUP BY  c.name,
+    ON        c.cid = yoyc.cid
+    GROUP BY  yoyc.cid,
               yoyc.percentage_change,
               yoyc.start_year,
-              yoyc.end_year;`;
-
-  console.log(query);
+              yoyc.end_year
+    ORDER BY  yoyc.percentage_change DESC;`;
 
   connection.query(query, (err, rows) => {
     if (err) console.log(`[!] /yoyTuples route: ${err}`);
@@ -182,33 +173,34 @@ router.get('/yoyTuples/:yoyIndicator', (req, res) => {
 });
 
 // TODO: Convert to a GET route.
-router.post('/yoyPairTuples', (req, res) => {
+router.get('/yoyPairTuples/:indicatorNumerator/:indicatorDenominator', (req, res) => {
   const query = `
     WITH year_over_year_changes AS (
       SELECT    i1start.cid,
                 i1start.year    AS start_year,
                 i1end.year      AS end_year,
                 ((i1end.value / i2end.value) - (i1start.value / i2start.value)) / (i1start.value / i2start.value) AS percentage_change
-      FROM      ${req.body.indicatorNumerator} i1start
-      JOIN      ${req.body.indicatorNumerator} i1end
+      FROM      ${req.params.indicatorNumerator} i1start
+      JOIN      ${req.params.indicatorNumerator} i1end
       ON        i1end.cid = i1start.cid
-      JOIN      ${req.body.indicatorDenominator} i2start
+      JOIN      ${req.params.indicatorDenominator} i2start
       ON        i2start.cid = i1start.cid
-      JOIN      ${req.body.indicatorDenominator} i2end
+      JOIN      ${req.params.indicatorDenominator} i2end
       ON        i2end.cid = i1start.cid
       WHERE     i1start.year = i2start.year
       AND       i1end.year = i1start.year + 1
       AND       i2end.year = i2start.year + 1 )
-    SELECT    yoyc.cid,
+    SELECT    c.name,
               yoyc.start_year,
               yoyc.end_year,
               max(yoyc.percentage_change) AS percentage_change
     FROM      year_over_year_changes yoyc
+    JOIN      Country c
+    ON        c.cid = yoyc.cid
     GROUP BY  yoyc.cid,
               yoyc.start_year,
-              yoyc.end_year;`;
-
-  console.log(query);
+              yoyc.end_year
+    ORDER BY  yoyc.percentage_change DESC;`;
 
   connection.query(query, (err, rows) => {
     if (err) console.log(`[!] /yoyPairTuples route: ${err}`);
@@ -249,8 +241,6 @@ router.post('/completenessTuples', (req, res) => {
               (vpc.num_values / (${req.body.maxYear} - ${req.body.minYear} + 1)) AS completeness
     FROM      values_per_country vpc
     ORDER BY  completeness DESC;`;
-
-  console.log(query);
 
   connection.query(query, (err, rows) => {
     if (err) console.log(`[!] /completenessTuples route: ${err}`);

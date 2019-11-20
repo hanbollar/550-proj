@@ -37,17 +37,20 @@ app.controller('graphsController', function ($scope, $http) {
 });
 
 // For unknown reasons, Angular breaks if an arrow callback is used here.
-app.controller('factsController', function ($scope, $http, $attrs) {
+app.controller('indicatorsController', function ($scope, $http) {
   $http({
     url: '/indicatorTuples',
     method: 'GET',
   }).then((res) => {
     $scope.indicators = res.data;
   }, (err) => {
-    console.log('[!] Facts controller: ', err);
+    console.log('[!] Indicators controller: ', err);
   });
+});
 
-  if (!$attrs.yoyIndicator) throw new Error('[!] factsController missing argument: yoyIndicator');
+// For unknown reasons, Angular breaks if an arrow callback is used here.
+app.controller('yoyController', function ($scope, $http, $attrs) {
+  if (!$attrs.indicator) throw new Error('[!] yoyController missing argument: indicator');
 
   $http({
     url: `/yoyTuples/${$attrs.indicator}`,
@@ -55,6 +58,21 @@ app.controller('factsController', function ($scope, $http, $attrs) {
   }).then((res) => {
     $scope.yoys = res.data;
   }, (err) => {
-    console.log('[!] Facts controller: ', err);
+    console.log('[!] Yoy controller: ', err);
+  });
+});
+
+// For unknown reasons, Angular breaks if an arrow callback is used here.
+app.controller('yoyPairController', function ($scope, $http, $attrs) {
+  if (!$attrs.indicatorNumerator) throw new Error('[!] yoyPairController missing argument: indicatorNumerator');
+  if (!$attrs.indicatorDenominator) throw new Error('[!] yoyPairController missing argument: indicatorDenominator');
+
+  $http({
+    url: `/yoyPairTuples/${$attrs.indicatorNumerator}/${$attrs.indicatorDenominator}`,
+    method: 'GET',
+  }).then((res) => {
+    $scope.yoyPairs = res.data;
+  }, (err) => {
+    console.log('[!] Yoy pair controller: ', err);
   });
 });
