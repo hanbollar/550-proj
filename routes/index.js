@@ -54,6 +54,17 @@ router.get('/indicatorTuples', (req, res) => {
   });
 });
 
+// TODO: Make this actually select years properly.
+router.get('/yearTuples', (req, res) => {
+  const rows = [];
+
+  for (let i = 1900; i <= 2020; i += 1) {
+    rows.push(i);
+  }
+
+  res.send(rows);
+});
+
 router.get('/cardTuples/:indicator/:minYear/:maxYear', (req, res) => {
   const query = `
     WITH values_for_countries AS (

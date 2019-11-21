@@ -4,22 +4,47 @@
 
 const app = angular.module('angularjsNodejsTutorial', []);
 
-// TODO: Fix these controllers.
-
 // For unknown reasons, Angular breaks if an arrow callback is used here.
-app.controller('cardsController', function ($scope, $http, $attrs) {
-  if (!$attrs.indicator) throw new Error('[!] Missing argument');
-  if (!$attrs.minYear) throw new Error('[!] Missing argument');
-  if (!$attrs.maxYear) throw new Error('[!] Missing argument');
-
+app.controller('indicatorsController', function ($scope, $http) {
   $http({
-    url: `/cardTuples/${$attrs.indicator}/${$attrs.minYear}/${$attrs.maxYear}`,
+    url: '/indicatorTuples',
     method: 'GET',
   }).then((res) => {
-    $scope.countries = res.data;
+    $scope.indicators = res.data;
   }, (err) => {
     console.log('[!] ', err);
   });
+});
+
+// For unknown reasons, Angular breaks if an arrow callback is used here.
+app.controller('yearsController', function ($scope, $http) {
+  $http({
+    url: '/yearTuples',
+    method: 'GET',
+  }).then((res) => {
+    $scope.years = res.data;
+  }, (err) => {
+    console.log('[!] ', err);
+  });
+});
+
+// For unknown reasons, Angular breaks if an arrow callback is used here.
+app.controller('cardsController', function ($scope, $http) {
+  $scope.changedInput = function (indicator, minYear, maxYear) {
+    if (!indicator) throw new Error('[!] Missing argument');
+    if (!indicator.code) throw new Error('[!] Missing argument');
+    if (!minYear) throw new Error('[!] Missing argument');
+    if (!maxYear) throw new Error('[!] Missing argument');
+
+    $http({
+      url: `/cardTuples/${indicator.code}/${minYear}/${maxYear}`,
+      method: 'GET',
+    }).then((res) => {
+      $scope.cards = res.data;
+    }, (err) => {
+      console.log('[!] ', err);
+    });
+  };
 });
 
 // For unknown reasons, Angular breaks if an arrow callback is used here.
@@ -35,20 +60,8 @@ app.controller('graphsController', function ($scope, $http) {
 });
 
 // For unknown reasons, Angular breaks if an arrow callback is used here.
-app.controller('indicatorsController', function ($scope, $http) {
-  $http({
-    url: '/indicatorTuples',
-    method: 'GET',
-  }).then((res) => {
-    $scope.indicators = res.data;
-  }, (err) => {
-    console.log('[!] ', err);
-  });
-});
-
-// For unknown reasons, Angular breaks if an arrow callback is used here.
 app.controller('yoyController', function ($scope, $http) {
-  $scope.changedIndicator = function (indicator) {
+  $scope.changedInput = function (indicator) {
     if (!indicator) throw new Error('[!] Missing argument');
     if (!indicator.code) throw new Error('[!] Missing argument');
 
@@ -64,7 +77,7 @@ app.controller('yoyController', function ($scope, $http) {
 });
 
 app.controller('yoyPairController', function ($scope, $http) {
-  $scope.changedIndicators = function (indicatorNumerator, indicatorDenominator) {
+  $scope.changedInput = function (indicatorNumerator, indicatorDenominator) {
     if (!indicatorNumerator) throw new Error('[!] Missing argument');
     if (!indicatorNumerator.code) throw new Error('[!] Missing argument');
     if (!indicatorDenominator) throw new Error('[!] Missing argument');

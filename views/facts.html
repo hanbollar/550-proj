@@ -19,7 +19,7 @@
 
     <div ng-controller="indicatorsController">
       <div ng-controller="yoyController" ng-model="yoys" class="fact-box">
-        <select class="dropdown" ng-model="indicatorSelected" ng-change="changedIndicator(indicatorSelected)" data-ng-options="indicator as indicator.name for indicator in indicators">
+        <select class="dropdown" ng-model="indicatorSelected" ng-change="changedInput(indicatorSelected)" data-ng-options="indicator as indicator.name for indicator in indicators">
           <option value="">Select an indicator...</option>
         </select>
 
@@ -32,11 +32,11 @@
       </div>
 
       <div ng-controller="yoyPairController" ng-model="yoyPairs" class="fact-box">
-        <select class="dropdown" ng-model="indicatorNumeratorSelected" ng-change="changedIndicators(indicatorNumeratorSelected, indicatorDenominatorSelected)" data-ng-options="indicator as indicator.name for indicator in indicators">
+        <select class="dropdown" ng-model="indicatorNumeratorSelected" ng-change="changedInput(indicatorNumeratorSelected, indicatorDenominatorSelected)" data-ng-options="indicator as indicator.name for indicator in indicators">
           <option value="">Select an indicator...</option>
         </select>
 
-        <select class="dropdown" ng-model="indicatorDenominatorSelected" ng-change="changedIndicators(indicatorNumeratorSelected, indicatorDenominatorSelected)" data-ng-options="indicator as indicator.name for indicator in indicators">
+        <select class="dropdown" ng-model="indicatorDenominatorSelected" ng-change="changedInput(indicatorNumeratorSelected, indicatorDenominatorSelected)" data-ng-options="indicator as indicator.name for indicator in indicators">
           <option value="">Select an indicator...</option>
         </select>
 

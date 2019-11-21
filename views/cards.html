@@ -14,16 +14,33 @@
     <link href="/stylesheets/cards.css" rel="stylesheet">
   </head>
 
-  <!-- TODO: Un-hardcode the values of indicator, minyear, and maxyear. -->
-  <body onload="populateNavBar();" ng-controller="cardsController" indicator="ny_gdp_mktp_kd" min_year="1970" max_year="2010">
+  <body onload="populateNavBar();">
     <nav id="nav"></nav>
 
-    <div class="outer-container">
-      <div class="inner-container">
-        <div class="outer-box" ng-repeat="c in countries">
-          <div class="inner-box">
-            {{c.name}}<br />
-            {{c.percentage_change}}
+    <div ng-controller="indicatorsController">
+      <div ng-controller="yearsController">
+        <div ng-controller="cardsController" ng-model="cards">
+          <select class="dropdown" ng-model="indicatorSelected" ng-change="changedInput(indicatorSelected, minYearSelected, maxYearSelected)" data-ng-options="indicator as indicator.name for indicator in indicators">
+            <option value="">Select an indicator...</option>
+          </select>
+
+          <select class="dropdown" ng-model="minYearSelected" ng-change="changedInput(indicatorSelected, minYearSelected, maxYearSelected)" data-ng-options="year as year for year in years">
+            <option value="">Select a start year...</option>
+          </select>
+
+          <select class="dropdown" ng-model="maxYearSelected" ng-change="changedInput(indicatorSelected, minYearSelected, maxYearSelected)" data-ng-options="year as year for year in years">
+            <option value="">Select an end year...</option>
+          </select>
+
+          <div class="outer-container">
+            <div class="inner-container">
+              <div class="outer-box" ng-repeat="c in cards">
+                <div class="inner-box">
+                  {{c.name}}<br />
+                  {{c.percentage_change}}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
