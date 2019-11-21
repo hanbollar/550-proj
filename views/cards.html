@@ -24,13 +24,19 @@
             <option value="">Select an indicator...</option>
           </select>
 
+          <br />
+
           <select class="dropdown" ng-model="minYearSelected" ng-change="changedInput(indicatorSelected, minYearSelected, maxYearSelected)" data-ng-options="year as year for year in years">
             <option value="">Select a start year...</option>
           </select>
 
+          <br />
+
           <select class="dropdown" ng-model="maxYearSelected" ng-change="changedInput(indicatorSelected, minYearSelected, maxYearSelected)" data-ng-options="year as year for year in years">
             <option value="">Select an end year...</option>
           </select>
+
+          <br />
 
           <div class="outer-container">
             <div class="inner-container">
