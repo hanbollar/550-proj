@@ -14,43 +14,39 @@
     <link href="/stylesheets/facts.css" rel="stylesheet">
   </head>
 
-  <!-- TODO: Un-hardcode the indicator value. -->
   <body onload="populateNavBar();">
     <nav id="nav"></nav>
 
-    <!-- TODO: Don't run the indicators query multiple times. -->
+    <div ng-controller="indicatorsController">
+      <div ng-controller="yoyController" ng-model="yoys" class="fact-box">
+        <select class="dropdown" ng-model="indicatorSelected" ng-change="changedIndicator(indicatorSelected)" data-ng-options="indicator as indicator.name for indicator in indicators">
+          <option value="">Select an indicator...</option>
+        </select>
 
-    <div ng-controller="yoyController" ng-model="yoys" indicator="ny_gdp_mktp_kd" class="fact-box">
-      <select ng-controller="indicatorsController" name="indicators" class="dropdown">
-        <option value="">Select an indicator...</option>
-        <option ng-repeat="i in indicators" value="{{i.name}}">{{i.name}}</option>
-      </select>
+        Greatest year-over-year change for the selected indicator:<br/>
+        <br/>
+        {{yoys[0].name}}<br />
+        {{yoys[0].percentage_change}}<br />
+        {{yoys[0].start_year}}<br />
+        {{yoys[0].end_year}}<br />
+      </div>
 
-      Greatest year-over-year change for the selected indicator:<br/>
-      <br/>
-      {{yoys[0].name}}<br />
-      {{yoys[0].percentage_change}}<br />
-      {{yoys[0].start_year}}<br />
-      {{yoys[0].end_year}}<br />
-    </div>
+      <div ng-controller="yoyPairController" ng-model="yoyPairs" class="fact-box">
+        <select class="dropdown" ng-model="indicatorNumeratorSelected" ng-change="changedIndicators(indicatorNumeratorSelected, indicatorDenominatorSelected)" data-ng-options="indicator as indicator.name for indicator in indicators">
+          <option value="">Select an indicator...</option>
+        </select>
 
-    <div ng-controller="yoyPairController" ng-model="yoyPairs" indicator_numerator="ny_gdp_mktp_kd" indicator_denominator="ny_gnp_mktp_kd" class="fact-box">
-      <select ng-controller="indicatorsController" name="indicators" class="dropdown">
-        <option value="">Select an indicator as the numerator...</option>
-        <option ng-repeat="i in indicators" value="{{i.name}}">{{i.name}}</option>
-      </select>
+        <select class="dropdown" ng-model="indicatorDenominatorSelected" ng-change="changedIndicators(indicatorNumeratorSelected, indicatorDenominatorSelected)" data-ng-options="indicator as indicator.name for indicator in indicators">
+          <option value="">Select an indicator...</option>
+        </select>
 
-      <select ng-controller="indicatorsController" name="indicators" class="dropdown">
-        <option value="">Select an indicator as the denominator...</option>
-        <option ng-repeat="i in indicators" value="{{i.name}}">{{i.name}}</option>
-      </select>
-
-      Greatest year-over-year ratio change for the selected indicators:<br/>
-      <br/>
-      {{yoyPairs[0].name}}<br />
-      {{yoyPairs[0].percentage_change}}<br />
-      {{yoyPairs[0].start_year}}<br />
-      {{yoyPairs[0].end_year}}<br />
+        Greatest year-over-year change for the selected indicator:<br/>
+        <br/>
+        {{yoyPairs[0].name}}<br />
+        {{yoyPairs[0].percentage_change}}<br />
+        {{yoyPairs[0].start_year}}<br />
+        {{yoyPairs[0].end_year}}<br />
+      </div>
     </div>
 
     <!-- Include these before the end of body tag in every HTML file -->
