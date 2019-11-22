@@ -44,7 +44,8 @@ router.get('/countryTuples', (req, res) => {
 router.get('/indicatorTuples', (req, res) => {
   const query = `
     SELECT *
-    FROM Indicator;`;
+    FROM Indicator
+    WHERE table_exists;`;
 
   connection.query(query, (err, rows) => {
     if (err) console.log(`[!] /indicatorTuples route: ${err}`);
