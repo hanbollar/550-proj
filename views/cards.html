@@ -42,8 +42,11 @@
             <div class="inner-container">
               <div class="outer-box" ng-repeat="c in cards">
                 <div class="inner-box">
+                  <img src= "{{'../assets/flag_images/' + ((c.name.split(' ').join('')) | lowercase) + '.png'}}" onerror=this.src='../assets/flag_images/blank.png' alt='not found'  width="100%" float="top"></img>
+                  <p float = "bottom" font-size = "100%">
                   {{c.name}}<br />
-                  {{c.percentage_change}}
+                  {{(c.percentage_change | number: 2) + '%'}}
+                  </p>
                 </div>
               </div>
             </div>
