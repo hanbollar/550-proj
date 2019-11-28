@@ -60,28 +60,6 @@ app.controller('cardsController', function ($scope, $http) {
 });
 
 // For unknown reasons, Angular breaks if an arrow callback is used here.
-app.controller('graphsController', function ($scope, $http) {
-  $scope.changedInput = function (indicator, minYear, maxYear, country) {
-    if (!indicator) return;
-    if (!indicator.code || indicator.code === '') return;
-    if (!minYear || minYear === '') return;
-    if (!maxYear || maxYear === '') return;
-    if (!country) return;
-    if (!country.name || country.name === '') return;
-
-    $http({
-      url: `/graphTuples/${indicator.code}/${minYear}/${maxYear}/${country.name}`,
-      method: 'GET',
-    }).then((res) => {
-      $scope.graphs = res.data;
-      console.log($scope.graphs);
-    }, (err) => {
-      console.log('[!] ', err);
-    });
-  };
-});
-
-// For unknown reasons, Angular breaks if an arrow callback is used here.
 app.controller('yoyController', function ($scope, $http) {
   $scope.changedInput = function (indicator) {
     if (!indicator) return;

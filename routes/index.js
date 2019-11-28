@@ -123,22 +123,36 @@ router.get('/cardTuples/:indicator/:minYear/:maxYear', (req, res) => {
   });
 });
 
-router.get('/graphTuples/:indicator/:minYear/:maxYear/:country', (req, res) => {
-  if (!req.params.indicator || req.params.indicator === '') { res.sendStatus(400); return; }
-  if (!req.params.minYear || req.params.minYear === '') { res.sendStatus(400); return; }
-  if (!req.params.maxYear || req.params.maxYear === '') { res.sendStatus(400); return; }
-  if (req.params.minYear > req.params.maxYear) { res.sendStatus(400); return; }
-  if (!req.params.country || req.params.country === '') { res.sendStatus(400); return; }
+router.get('/graphTuples/*', (req, res) => {
+  const params = req.params[0].split('/');
+
+  if (params.length < 4) { res.sendStatus(400); return; }
+
+  const indicator = params[0];
+  const minYear = params[1];
+  const maxYear = params[2];
+
+  if (minYear > maxYear) { res.sendStatus(400); return; }
 
   const countryNames = [];
-  countryNames.push(req.params.country);
+  const timeout = 20;
+  let i = 3;
+
+  while (i < timeout) {
+    if (params[i]) {
+      countryNames.push(params[i]);
+      i += 1;
+    } else {
+      break;
+    }
+  }
 
   let query = `
     SELECT    i.cid,
               c.name,
               i.year,
               i.value
-    FROM      ${req.params.indicator} i
+    FROM      ${indicator} i
     JOIN      Country c
     ON        c.cid = i.cid
     WHERE     (c.name = '${countryNames[0]}'`;
@@ -150,8 +164,8 @@ router.get('/graphTuples/:indicator/:minYear/:maxYear/:country', (req, res) => {
   }
 
   query += `)
-    AND       i.year >= ${req.params.minYear}
-    AND       i.year <= ${req.params.maxYear}
+    AND       i.year >= ${minYear}
+    AND       i.year <= ${maxYear}
     ORDER BY  c.name, i.year;`;
 
   console.log(query);
