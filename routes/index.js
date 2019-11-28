@@ -154,6 +154,8 @@ router.get('/graphTuples/:indicator/:minYear/:maxYear/:country', (req, res) => {
     AND       i.year <= ${req.params.maxYear}
     ORDER BY  c.name, i.year;`;
 
+  console.log(query);
+
   connection.query(query, (err, rows) => {
     if (err) console.log(`[!] /graphTuples route: ${err}`);
     else {
