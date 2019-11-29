@@ -17,13 +17,42 @@
     <link href="/stylesheets/cards.css" rel="stylesheet">
   </head>
 
-  <body onload="populateNavBar();"  ng-controller="graphsController">
+  <body onload="populateNavBar();">
     <nav id="nav"></nav>
 
-    <div id="tester" style="width:600px;height:250px;"></div>
+    <div ng-controller="countriesController">
+      <div ng-controller="indicatorsController">
+        <div ng-controller="yearsController">
+          <select id="countryDropdown" class="dropdown" onchange="constructGraphs();" ng-model="countrySelected" data-ng-options="country as country.name for country in countries">
+            <option value="">Select a country...</option>
+          </select>
 
+          <br />
+
+          <select id="indicatorDropdown" class="dropdown" onchange="constructGraphs();">
+            <option value="">Select an indicator...</option>
+            <option ng-repeat="i in indicators" value="{{i.code}}">{{i.name}}</option>
+          </select>
+
+          <br />
+
+          <select id="minYearDropdown" class="dropdown" onchange="constructGraphs();" ng-model="minYearSelected" data-ng-options="year as year for year in years">
+            <option value="">Select a start year...</option>
+          </select>
+
+          <br />
+
+          <select id="maxYearDropdown" class="dropdown" onchange="constructGraphs();" ng-model="maxYearSelected" data-ng-options="year as year for year in years">
+            <option value="">Select an end year...</option>
+          </select>
+
+          <br />
+        </div>
+
+        <div id="graphs"></div>
+    </div>
+    
     <script src="javascripts/graphs.js" type="text/javascript"></script>
-
     <!-- Include these before the end of body tag in every HTML file -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>

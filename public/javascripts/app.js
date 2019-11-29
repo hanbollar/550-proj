@@ -17,6 +17,18 @@ app.controller('indicatorsController', function ($scope, $http) {
 });
 
 // For unknown reasons, Angular breaks if an arrow callback is used here.
+app.controller('countriesController', function ($scope, $http) {
+  $http({
+    url: '/countryTuples',
+    method: 'GET',
+  }).then((res) => {
+    $scope.countries = res.data;
+  }, (err) => {
+    console.log('[!] ', err);
+  });
+});
+
+// For unknown reasons, Angular breaks if an arrow callback is used here.
 app.controller('yearsController', function ($scope, $http) {
   $http({
     url: '/yearTuples',
@@ -31,10 +43,10 @@ app.controller('yearsController', function ($scope, $http) {
 // For unknown reasons, Angular breaks if an arrow callback is used here.
 app.controller('cardsController', function ($scope, $http) {
   $scope.changedInput = function (indicator, minYear, maxYear) {
-    if (!indicator) throw new Error('[!] Missing argument');
-    if (!indicator.code) throw new Error('[!] Missing argument');
-    if (!minYear) throw new Error('[!] Missing argument');
-    if (!maxYear) throw new Error('[!] Missing argument');
+    if (!indicator) return;
+    if (!indicator.code || indicator.code === '') return;
+    if (!minYear || minYear === '') return;
+    if (!maxYear || maxYear === '') return;
 
     $http({
       url: `/cardTuples/${indicator.code}/${minYear}/${maxYear}`,
@@ -48,22 +60,10 @@ app.controller('cardsController', function ($scope, $http) {
 });
 
 // For unknown reasons, Angular breaks if an arrow callback is used here.
-app.controller('graphsController', function ($scope, $http) {
-  $http({
-    url: '/graphTuples',
-    method: 'POST',
-  }).then((res) => {
-    $scope.indicators = res.data;
-  }, (err) => {
-    console.log('[!] ', err);
-  });
-});
-
-// For unknown reasons, Angular breaks if an arrow callback is used here.
 app.controller('yoyController', function ($scope, $http) {
   $scope.changedInput = function (indicator) {
-    if (!indicator) throw new Error('[!] Missing argument');
-    if (!indicator.code) throw new Error('[!] Missing argument');
+    if (!indicator) return;
+    if (!indicator.code || indicator.code === '') return;
 
     $http({
       url: `/yoyTuples/${indicator.code}`,
@@ -78,10 +78,10 @@ app.controller('yoyController', function ($scope, $http) {
 
 app.controller('yoyPairController', function ($scope, $http) {
   $scope.changedInput = function (indicatorNumerator, indicatorDenominator) {
-    if (!indicatorNumerator) throw new Error('[!] Missing argument');
-    if (!indicatorNumerator.code) throw new Error('[!] Missing argument');
-    if (!indicatorDenominator) throw new Error('[!] Missing argument');
-    if (!indicatorDenominator.code) throw new Error('[!] Missing argument');
+    if (!indicatorNumerator) return;
+    if (!indicatorNumerator.code || indicatorNumerator.code === '') return;
+    if (!indicatorDenominator) return;
+    if (!indicatorDenominator.code || indicatorDenominator.code === '') return;
 
     $http({
       url: `/yoyPairTuples/${indicatorNumerator.code}/${indicatorDenominator.code}`,

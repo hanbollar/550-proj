@@ -31,7 +31,8 @@ router.get('/facts', (req, res) => {
 router.get('/countryTuples', (req, res) => {
   const query = `
     SELECT *
-    FROM Country;`;
+    FROM Country c
+    ORDER BY c.name;`;
 
   connection.query(query, (err, rows) => {
     if (err) console.log(`[!] /countryTuples route: ${err}`);
@@ -44,8 +45,9 @@ router.get('/countryTuples', (req, res) => {
 router.get('/indicatorTuples', (req, res) => {
   const query = `
     SELECT *
-    FROM Indicator
-    WHERE table_exists;`;
+    FROM Indicator i
+    WHERE table_exists
+    ORDER BY i.name;`;
 
   connection.query(query, (err, rows) => {
     if (err) console.log(`[!] /indicatorTuples route: ${err}`);
@@ -67,6 +69,11 @@ router.get('/yearTuples', (req, res) => {
 });
 
 router.get('/cardTuples/:indicator/:minYear/:maxYear', (req, res) => {
+  if (!req.params.indicator || req.params.indicator === '') { res.sendStatus(400); return; }
+  if (!req.params.minYear || req.params.minYear === '') { res.sendStatus(400); return; }
+  if (!req.params.maxYear || req.params.maxYear === '') { res.sendStatus(400); return; }
+  if (req.params.minYear > req.params.maxYear) { res.sendStatus(400); return; }
+
   const query = `
     WITH values_for_countries AS (
       SELECT    i.cid,
@@ -116,10 +123,28 @@ router.get('/cardTuples/:indicator/:minYear/:maxYear', (req, res) => {
   });
 });
 
-// TODO: Convert to a GET route.
-router.post('/graphTuples', (req, res) => {
-  if (req.body.countryNames.length === 0) {
-    res.sendStatus(400);
+router.get('/graphTuples/*', (req, res) => {
+  const params = req.params[0].split('/');
+
+  if (params.length < 4) { res.sendStatus(400); return; }
+
+  const indicator = params[0];
+  const minYear = params[1];
+  const maxYear = params[2];
+
+  if (minYear > maxYear) { res.sendStatus(400); return; }
+
+  const countryNames = [];
+  const timeout = 20;
+  let i = 3;
+
+  while (i < timeout) {
+    if (params[i]) {
+      countryNames.push(params[i]);
+      i += 1;
+    } else {
+      break;
+    }
   }
 
   let query = `
@@ -127,21 +152,23 @@ router.post('/graphTuples', (req, res) => {
               c.name,
               i.year,
               i.value
-    FROM      ${req.body.indicator} i
+    FROM      ${indicator} i
     JOIN      Country c
     ON        c.cid = i.cid
-    WHERE     (c.name = '${req.body.countryNames[0]}'`;
+    WHERE     (c.name = '${countryNames[0]}'`;
 
   // For every country beyond the first, add a line to the query.
-  for (let i = 1; i < req.body.countryNames.length; i += 1) {
+  for (let i = 1; i < countryNames.length; i += 1) {
     query += `
-    OR        c.name = '${req.body.countryNames[i]}'`;
+    OR        c.name = '${countryNames[i]}'`;
   }
 
   query += `)
-    AND       i.year >= ${req.body.minYear}
-    AND       i.year <= ${req.body.maxYear}
+    AND       i.year >= ${minYear}
+    AND       i.year <= ${maxYear}
     ORDER BY  c.name, i.year;`;
+
+  console.log(query);
 
   connection.query(query, (err, rows) => {
     if (err) console.log(`[!] /graphTuples route: ${err}`);
@@ -151,8 +178,9 @@ router.post('/graphTuples', (req, res) => {
   });
 });
 
-// TODO: Convert to a GET route.
 router.get('/yoyTuples/:indicator', (req, res) => {
+  if (!req.params.indicator || req.params.indicator === '') { res.sendStatus(400); return; }
+
   const query = `
     WITH year_over_year_changes AS (
       SELECT  istart.cid,
@@ -184,8 +212,10 @@ router.get('/yoyTuples/:indicator', (req, res) => {
   });
 });
 
-// TODO: Convert to a GET route.
 router.get('/yoyPairTuples/:indicatorNumerator/:indicatorDenominator', (req, res) => {
+  if (!req.params.indicatorNumerator || req.params.indicatorNumerator === '') { res.sendStatus(400); return; }
+  if (!req.params.indicatorDenominator || req.params.indicatorDenominator === '') { res.sendStatus(400); return; }
+
   const query = `
     WITH year_over_year_changes AS (
       SELECT    i1start.cid,
@@ -222,11 +252,15 @@ router.get('/yoyPairTuples/:indicatorNumerator/:indicatorDenominator', (req, res
   });
 });
 
-// TODO: Convert to a GET route.
-router.post('/completenessTuples', (req, res) => {
-  if (req.body.countryNames.length === 0) {
-    res.sendStatus(400);
-  }
+router.get('/completenessTuples/:indicator/:minYear/:maxYear/:country', (req, res) => {
+  if (!req.params.indicator || req.params.indicator === '') { res.sendStatus(400); return; }
+  if (!req.params.minYear || req.params.minYear === '') { res.sendStatus(400); return; }
+  if (!req.params.maxYear || req.params.maxYear === '') { res.sendStatus(400); return; }
+  if (req.params.minYear > req.params.maxYear) { res.sendStatus(400); return; }
+  if (!req.params.country || req.params.country === '') { res.sendStatus(400); return; }
+
+  const countryNames = [];
+  countryNames.push(req.params.country);
 
   let query = `
     WITH values_per_country AS (
@@ -236,21 +270,21 @@ router.post('/completenessTuples', (req, res) => {
       FROM      ${req.body.indicator} i
       JOIN      Country c
       ON        c.cid = i.cid
-      WHERE     i.year >= ${req.body.minYear}
-      AND       i.year <= ${req.body.maxYear}
-      AND      (c.name = '${req.body.countryNames[0]}'`;
+      WHERE     i.year >= ${req.params.minYear}
+      AND       i.year <= ${req.params.maxYear}
+      AND      (c.name = '${countryNames[0]}'`;
 
   // For every country beyond the first, add a line to the query.
-  for (let i = 1; i < req.body.countryNames.length; i += 1) {
+  for (let i = 1; i < countryNames.length; i += 1) {
     query += `
-      OR        c.name = '${req.body.countryNames[i]}'`;
+      OR        c.name = '${countryNames[i]}'`;
   }
 
   query += `)
       GROUP BY  i.cid,
                 c.name)
     SELECT    vpc.name,
-              (vpc.num_values / (${req.body.maxYear} - ${req.body.minYear} + 1)) AS completeness
+              (vpc.num_values / (${req.params.maxYear} - ${req.params.minYear} + 1)) AS completeness
     FROM      values_per_country vpc
     ORDER BY  completeness DESC;`;
 
