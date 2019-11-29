@@ -29,8 +29,9 @@
 
           <br />
 
-          <select id="indicatorDropdown" class="dropdown" onchange="constructGraphs();" ng-model="indicatorSelected" data-ng-options="indicator as indicator.code for indicator in indicators">
+          <select id="indicatorDropdown" class="dropdown" onchange="constructGraphs();">
             <option value="">Select an indicator...</option>
+            <option ng-repeat="i in indicators" value="{{i.code}}">{{i.name}}</option>
           </select>
 
           <br />

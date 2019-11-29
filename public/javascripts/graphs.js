@@ -24,7 +24,7 @@ function constructGraphs() {
   if (maxYearDropdown.selectedIndex === 0) { return; }
   if (countryDropdown.selectedIndex === 0) { return; }
 
-  const indicator = indicatorDropdown.options[indicatorDropdown.selectedIndex].label;
+  const indicator = indicatorDropdown.options[indicatorDropdown.selectedIndex].value;
   const minYear = minYearDropdown.options[minYearDropdown.selectedIndex].label;
   const maxYear = maxYearDropdown.options[maxYearDropdown.selectedIndex].label;
   const country = countryDropdown.options[countryDropdown.selectedIndex].label;
