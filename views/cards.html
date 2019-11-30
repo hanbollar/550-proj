@@ -44,7 +44,7 @@
                 <div class="inner-box" >
                   <img src= "{{'../assets/flag_images/' + ((c.name.split(' ').join('')) | lowercase) + '.png'}}" onerror=this.src='../assets/flag_images/blank.png' alt='not found'></img>
                    <br /><br /><p></p><p></p><p></p>
-                   <p><i><b ng-class="({{c.percentage_change}} >= 0) ? ({{c.percentage_change | number: 2}} == 0 ? 'white-class' : 'green-class') : 'red-class'">{{(c.percentage_change | number: 2) + '%'}}</b></i> <br/> 
+                   <p><i><b ng-class="({{c.percentage_change | number: 2}} >= 0.01) ? 'green-class' : {{c.percentage_change | number: 2}} <= -0.01 ? 'red-class' : 'white-class'">{{(c.percentage_change | number: 2) + '%'}}</b></i> <br/> 
                     {{c.name}}
                     </p>
                 </div>
