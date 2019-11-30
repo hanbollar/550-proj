@@ -41,12 +41,12 @@
           <div class="outer-container">
             <div class="inner-container">
               <div class="outer-box" ng-repeat="c in cards">
-                <div class="inner-box" vertical-align="top" font-size = "120%">
-                  <img src= "{{'../assets/flag_images/' + ((c.name.split(' ').join('')) | lowercase) + '.png'}}" onerror=this.src='../assets/flag_images/blank.png' alt='not found'  width="110%" float='top'></img>
-                   <p></p>{{c.name}}
-                    <span style="color: ({{c.percentage_change}}.value > 0) ? rgb(255, 0, 0) : rgb(0, 255, 10);">
-                      <i><b>{{(c.percentage_change | number: 2) + '%'}}</b></i>
-                    </span>
+                <div class="inner-box" >
+                  <img src= "{{'../assets/flag_images/' + ((c.name.split(' ').join('')) | lowercase) + '.png'}}" onerror=this.src='../assets/flag_images/blank.png' alt='not found'></img>
+                   <br /><br /><p></p><p></p><p></p>
+                   <p><i><b ng-class="({{c.percentage_change}} >= 0) ? ({{c.percentage_change | number: 2}} == 0 ? 'white-class' : 'green-class') : 'red-class'">{{(c.percentage_change | number: 2) + '%'}}</b></i> <br/> 
+                    {{c.name}}
+                    </p>
                 </div>
               </div>
             </div>

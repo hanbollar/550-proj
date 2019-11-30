@@ -27,11 +27,10 @@
   margin: 10px;
   border-radius: 5px;
   overflow: hidden;
-  color:white;
+  color: white;
 }
 
 .mine {
-  /*color: green;*/
   overflow:hidden;
 }
 
@@ -44,10 +43,38 @@
   text-align: center;
   margin: 10px;
   overflow: hidden;
+  height: 100%;
 }
 
-.mine {
+.inner-box img {
+  max-height: 60%;
+  width:110%;
+  float:top;
+}
 
+.inner-box p {
+  float: bottom;
+  margin: 2px;
+  font-size: 80%;
+  position: absolute;
+  padding-top: 120px;
+  width: 6%;
+}
+
+.inner-box p i {
+  font-size: 125%;
+}
+
+.green-class {
+  color: rgb(0,255,10);
+}
+
+.red-class {
+  color: rgb(255,10,0);
+}
+
+.white-class {
+  color: rgb(250,250,250);
 }
 
 .dropdown {
