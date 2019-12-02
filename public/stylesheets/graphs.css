@@ -1,38 +1,47 @@
-.outer-container {
+#outer-container {
   display: flex;
   flex-direction: row;
-  flex: 0 0 100%;
+  flex: 1 1 100%;
+  width: 100%;
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+
+#controls-container {
+  width: 300px;
+  height: 100%;
+}
+
+#graphs-container {
+  display: flex;
+  flex-direction: column;
   width: 100%;
   align-items: center;
   justify-content: center;
 }
 
-.inner-container {
-  display: flex;
-  flex-direction: row;
-  flex: 0 1 800px;
-  align-items: stretch;
-  justify-content: center;
-  flex-wrap: wrap;
+.dropdown {
+  width: 100%;
+  margin: 5px;
+  font-size: small;
 }
 
-.outer-box {
-  display: flex;
-  flex-direction: column;
-  flex: 0 0 800px;
-  height: 20px;
-	align-items: center;
-	justify-content: center;
-  background-color: rgba(255, 255, 255, 0.9);
-  margin: 10px;
-  border-radius: 5px;
+.checkboxes {
+  border: 2px solid #ccc;
+  width: 300px;
+  height: 120px;
+  margin: 5px;
+  margin-bottom: 20px;
+  overflow-y: scroll;
+  font-size: small;
+  background: white;
 }
 
-.inner-box {
-  display: flex;
-  flex-direction: row;
-	flex: 1 1 100%;
-	align-items: flex-start;
-  justify-content: flex-start;
-  margin: 10px;
+.filter {
+  width: 100%;
+  margin: 5px;
+}
+
+.graph {
+  margin: 5px;
 }

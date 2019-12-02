@@ -57,7 +57,6 @@ router.get('/indicatorTuples', (req, res) => {
   });
 });
 
-// TODO: Make this actually select years properly.
 router.get('/yearTuples', (req, res) => {
   const rows = [];
 
@@ -135,13 +134,13 @@ router.get('/graphTuples/*', (req, res) => {
   if (minYear > maxYear) { res.sendStatus(400); return; }
 
   const countryNames = [];
-  const timeout = 20;
-  let i = 3;
+  const timeout = 100;
+  let j = 3;
 
-  while (i < timeout) {
-    if (params[i]) {
-      countryNames.push(params[i]);
-      i += 1;
+  while (j < timeout) {
+    if (params[j]) {
+      countryNames.push(params[j]);
+      j += 1;
     } else {
       break;
     }
