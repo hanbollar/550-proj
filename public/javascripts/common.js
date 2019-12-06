@@ -20,6 +20,21 @@ function toggleShowControls() {
   }
 }
 
+// eslint-disable-next-line no-unused-vars
+function updateSliderLabels() {
+  const minYearSlider = document.getElementById('minYearSlider');
+  const maxYearSlider = document.getElementById('maxYearSlider');
+
+  const minYear = minYearSlider.value;
+  const maxYear = maxYearSlider.value;
+
+  const minYearLabel = document.getElementById('minYearLabel');
+  const maxYearLabel = document.getElementById('maxYearLabel');
+
+  minYearLabel.innerHTML = minYear;
+  maxYearLabel.innerHTML = maxYear;
+}
+
 function populateNavBar() {
   const nav = document.getElementById('nav');
   nav.className = 'navbar navbar-expand-lg navbar-light bg-light';

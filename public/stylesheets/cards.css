@@ -1,3 +1,7 @@
+h3 {
+  text-align: center;
+}
+
 #outerContainer {
   background: white;
 }
@@ -41,7 +45,7 @@
   flex: 0 0 300px;
   align-items: center;
   justify-content: center;
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: rgba(255, 255, 255, 0.2);
   margin: 10px;
   border-radius: 10px;
   overflow: hidden;
@@ -68,4 +72,20 @@
   display: flex;
   flex-direction: column;
   color: white;
+}
+
+.percentageIncrease {
+  color: rgb(0,255,10);
+}
+
+.percentageDecrease {
+  color: rgb(255,10,0);
+}
+  
+.yearRange {
+  text-align: right;
+}
+  
+.indicatorName {
+  font-style: italic;
 }

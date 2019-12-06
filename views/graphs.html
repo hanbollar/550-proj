@@ -63,14 +63,14 @@
           
           <div id="minYearControls" class="controls">
             <div>
-              <input id="minYearSlider" type="range" orient="vertical" min="1960" max="2020" value="1960" oninput="updateView();">
+              <input id="minYearSlider" type="range" orient="vertical" min="1960" max="2020" value="1960" oninput="updateSliderLabels();" onchange="updateView();">
               <span id="minYearLabel">1960</span>
             </div>
           </div>
 
           <div id="maxYearControls" class="controls">
             <div>
-              <input id="maxYearSlider" type="range" orient="vertical" min="1960" max="2020" value="2020" oninput="updateView();">
+              <input id="maxYearSlider" type="range" orient="vertical" min="1960" max="2020" value="2020" oninput="updateSliderLabels();" onchange="updateView();">
               <span id="maxYearLabel">2020</span>
             </div>
           </div>

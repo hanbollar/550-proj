@@ -31,10 +31,10 @@ function removeGraphs() {
   }
 }
 
-function constructGraph(dataMap, indicatorName) {
+function constructGraph(graphMap, indicatorName) {
   const dataSeries = [];
 
-  dataMap.forEach((countryData) => {
+  graphMap.forEach((countryData) => {
     dataSeries.push({
       x: countryData.years,
       y: countryData.values,
@@ -52,6 +52,8 @@ function constructGraph(dataMap, indicatorName) {
 
 // eslint-disable-next-line no-unused-vars
 function updateView() {
+  removeGraphs();
+
   const indicatorCheckboxesChecked = Array.from(document.getElementsByClassName('indicatorCheckbox'))
     .filter((indicatorCheckbox) => indicatorCheckbox.checked);
 
@@ -93,6 +95,7 @@ function updateView() {
   // At least one indicator is selected.
   // Compute and display average completeness percentages.
   const completenessMap = new Map();
+  const count = indicatorCheckboxesChecked.length;
   indicatorCheckboxesChecked.forEach((indicatorCheckbox) => {
     const indicatorCode = indicatorCheckbox.getAttribute('code');
 
@@ -106,17 +109,21 @@ function updateView() {
           const completenessForIndicator = Number(tuple.completeness);
 
           if (!completenessMap.has(countryName)) {
-            completenessMap.set(countryName, { count: 0, total: 0, average: 0 });
+            completenessMap.set(countryName, { total: 0, average: 0 });
           }
 
           const mapValue = completenessMap.get(countryName);
 
-          const newCount = mapValue.count + 1;
           const newTotal = mapValue.total + completenessForIndicator;
-          const newAverage = newTotal / newCount;
+          let newAverage;
+
+          if (count !== 0) {
+            newAverage = newTotal / count;
+          } else {
+            newAverage = 0;
+          }
 
           completenessMap.set(countryName, {
-            count: newCount,
             total: newTotal,
             average: newAverage,
           });
@@ -137,6 +144,7 @@ function updateView() {
   });
 
   if (countryCheckboxesChecked.length === 0) { return; }
+  const graphData = [];
 
   indicatorCheckboxesChecked.forEach((indicatorCheckbox) => {
     const indicatorCode = indicatorCheckbox.getAttribute('code');
@@ -144,7 +152,6 @@ function updateView() {
 
     let url = `/graphTuples/${indicatorCode}/${minYear}/${maxYear}`;
     countryCheckboxesChecked.forEach((countryDropdown) => { url += `/${countryDropdown.getAttribute('callsign')}`; });
-    const graphData = [];
 
     fetch(url)
       .then((res) => res.json())
@@ -162,8 +169,7 @@ function updateView() {
         });
 
         graphData.push(constructGraph(graphMap, indicatorName));
-      })
-      .then(() => {
+
         if (graphData.length >= indicatorCheckboxesChecked.length) {
           removeGraphs();
 

@@ -40,15 +40,23 @@ function resetControls() {
     primaryIndicatorControls.removeAttribute('style');
     secondaryIndicatorControls.style.display = 'none';
     tertiaryIndicatorControls.removeAttribute('style');
+
+    primaryIndicatorSearchFilter.placeholder = 'Filter primary indicators...';
+    tertiaryIndicatorSearchFilter.placeholder = 'Filter secondary indicators...';
   } else if (mode === 'yoy') {
     primaryIndicatorControls.removeAttribute('style');
     primaryIndicatorControls.style.width = '100%';
     secondaryIndicatorControls.style.display = 'none';
     tertiaryIndicatorControls.style.display = 'none';
+
+    primaryIndicatorSearchFilter.placeholder = 'Filter indicators...';
   } else if (mode === 'yoyPairs') {
     primaryIndicatorControls.removeAttribute('style');
     secondaryIndicatorControls.removeAttribute('style');
     tertiaryIndicatorControls.style.display = 'none';
+
+    primaryIndicatorSearchFilter.placeholder = 'Filter numerator indicators...';
+    secondaryIndicatorSearchFilter.placeholder = 'Filter denominator indicators...';
   }
 }
 
@@ -78,11 +86,11 @@ function displayPercentage(number) {
   const percentage = (number * 100).toFixed(2);
 
   if (percentage > 0) {
-    return `<h4 style="color:rgb(0,255,10);">${percentage}% increase</h4>`;
+    return `<h4 class="percentageIncrease">${percentage}% increase</h4>`;
   }
 
   if (percentage < 0) {
-    return `<h4 style="color:rgb(255,30,0);">${-percentage}% decrease</h4>`;
+    return `<h4 class="percentageDecrease">${-percentage}% decrease</h4>`;
   }
 
   return '<h4>0% increase</h4>';
@@ -154,7 +162,7 @@ function createIncreaseCards(minYear, maxYear) {
           <h3>${tuple.name}</h3><br />
           ${primaryIndicatorName}<br />
           ${displayPercentage(tuple.percentage_change)}<br />
-          <small style="text-align:right;">${minYear}-${maxYear}</small><br />`;
+          <small class="yearRange">${minYear}-${maxYear}</small><br />`;
         // We need to add tertiary data. Hide the card until that step is complete.
         } else {
           innerCard.style.display = 'none';
@@ -212,15 +220,14 @@ function createIncreaseCards(minYear, maxYear) {
 
                 let text = `
                 <h3>${card.countryName}</h3><br />
-                <small>${minYear}-${maxYear}</small><br />
-                <em style="color:lightblue">${primaryIndicatorName}</em><br />
+                <span class="indicatorName">${primaryIndicatorName}</span><br />
                 ${displayPercentage(card.primaryChange)}`;
 
                 cardNew.tertiaryChanges.forEach((tertiaryChange) => {
-                  text += `<br /><em style="color:lightblue">${tertiaryChange.indicatorName}</em><br />${displayPercentage(tertiaryChange.value)}`;
+                  text += `<br /><span class="indicatorName">${tertiaryChange.indicatorName}</span><br />${displayPercentage(tertiaryChange.value)}`;
                 });
 
-                text += `<small style="text-align:right;">${minYear}-${maxYear}</small><br />`;
+                text += `<small class="yearRange">${minYear}-${maxYear}</small><br />`;
 
                 cardNew.cardText.innerHTML = text;
               });
@@ -285,7 +292,7 @@ function createYoyCards(minYear, maxYear) {
         cardText.className = 'cardText';
         cardText.innerHTML = `
           <h3>${tuple.name}</h3><br />
-          <em style="color:lightblue">${primaryIndicatorName}</em><br />
+          <span class="indicatorName">${primaryIndicatorName}</span><br />
           ${displayPercentage(tuple.percentage_change)}
           between ${tuple.start_year} and ${tuple.end_year}`;
         innerCard.appendChild(cardText);
@@ -368,30 +375,15 @@ function createYoyPairsCards(minYear, maxYear) {
         cardText.innerHTML = `
           <h3>${tuple.name}</h3><br />
           <strong>The ratio of</strong><br />
-          <em style="color:lightblue">${primaryIndicatorName}</em><br />
+          <span class="indicatorName">${primaryIndicatorName}</span><br />
           <strong>relative to</strong><br />
-          <em style="color:lightblue">${secondaryIndicatorName}</em><br />
+          <span class="indicatorName">${secondaryIndicatorName}</span><br />
           <strong>experienced a</strong>
           ${displayPercentage(tuple.percentage_change)}
           <strong>between ${tuple.start_year} and ${tuple.end_year}</strong>`;
         innerCard.appendChild(cardText);
       });
     });
-}
-
-// eslint-disable-next-line no-unused-vars
-function updateSliderLabels() {
-  const minYearSlider = document.getElementById('minYearSlider');
-  const maxYearSlider = document.getElementById('maxYearSlider');
-
-  const minYear = minYearSlider.value;
-  const maxYear = maxYearSlider.value;
-
-  const minYearLabel = document.getElementById('minYearLabel');
-  const maxYearLabel = document.getElementById('maxYearLabel');
-
-  minYearLabel.innerHTML = minYear;
-  maxYearLabel.innerHTML = maxYear;
 }
 
 // eslint-disable-next-line no-unused-vars
