@@ -8,3 +8,77 @@ body {
   -o-background-size: cover;
   background-size: cover;
 }
+
+#controlsContainer {
+  display: flex;
+  flex-direction: row;
+  flex: 0 0 100%;
+  width: 100%;
+  align-items: flex-start;
+  justify-content: flex-start;
+  background: white;
+}
+
+.controls {
+  margin: 5px;
+}
+
+.boxes {
+  width: 100%;
+  height: 120px;
+  padding: 5px;
+  margin: 5px;
+  margin-bottom: 20px;
+  overflow-y: scroll;
+  border: 2px solid #ccc;
+  font-size: small;
+}
+
+.box {
+  display: flex;
+  flex-direction: row;
+  border-bottom: 1px solid #ccc;
+  padding-top: 2px;
+  padding-bottom: 2px;
+}
+
+.boxElement {
+  margin-left: 2px;
+  margin-right: 2px;
+}
+
+input[type=range][orient=vertical] {
+  writing-mode: bt-lr; /* IE */
+  -webkit-appearance: slider-vertical; /* WebKit */
+  width: 8px;
+  height: 225px;
+  padding: 0 5px;
+  margin-left: 10px;
+}
+
+#maxYearSlider {
+  direction: rtl;
+}
+
+#minYearControls {
+  margin-left: 10px;
+}
+
+.checkedFilter {
+  margin-left: 10px;
+}
+
+.searchFilter {
+  width: 100%;
+  margin: 5px;
+}
+
+#hider {
+  width: 100%;
+  text-align: center;
+  background: white;
+}
+
+#hider:hover {
+  cursor: pointer;
+}

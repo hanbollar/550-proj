@@ -2,7 +2,7 @@
 /* globals document fetch Plotly */
 
 // eslint-disable-next-line no-unused-vars
-function resetInputs() {
+function resetControls() {
   const indicatorSearchFilter = document.getElementById('indicatorSearchFilter');
   const indicatorCheckedFilter = document.getElementById('indicatorCheckedFilter');
   const countrySearchFilter = document.getElementById('countrySearchFilter');
@@ -21,13 +21,13 @@ function resetInputs() {
 }
 
 function removeGraphs() {
-  const graphs = document.getElementById('graphsContainer');
+  const graphsContainer = document.getElementById('graphsContainer');
 
-  let child = graphs.lastElementChild;
+  let child = graphsContainer.lastElementChild;
 
   while (child) {
-    graphs.removeChild(child);
-    child = graphs.lastElementChild;
+    graphsContainer.removeChild(child);
+    child = graphsContainer.lastElementChild;
   }
 }
 
@@ -52,11 +52,11 @@ function constructGraph(dataMap, indicatorName) {
 
 // eslint-disable-next-line no-unused-vars
 function updateView() {
-  const indicatorCheckboxedChecked = Array.from(document.getElementsByClassName('indicatorCheckbox'))
-    .filter((countryDropdown) => countryDropdown.checked === true);
+  const indicatorCheckboxesChecked = Array.from(document.getElementsByClassName('indicatorCheckbox'))
+    .filter((indicatorCheckbox) => indicatorCheckbox.checked);
 
   const countryCheckboxesChecked = Array.from(document.getElementsByClassName('countryCheckbox'))
-    .filter((countryDropdown) => countryDropdown.checked === true);
+    .filter((countryCheckbox) => countryCheckbox.checked);
 
   const countryCompletenesses = Array.from(document.getElementsByClassName('countryCompleteness'));
 
@@ -81,7 +81,7 @@ function updateView() {
   }
 
   // If no indicators are selected, clear the completeness percentages and return.
-  if (indicatorCheckboxedChecked.length === 0) {
+  if (indicatorCheckboxesChecked.length === 0) {
     countryCompletenesses.forEach((countryCompleteness) => {
       const newCountryCompleteness = countryCompleteness;
       newCountryCompleteness.innerHTML = '';
@@ -93,7 +93,7 @@ function updateView() {
   // At least one indicator is selected.
   // Compute and display average completeness percentages.
   const completenessMap = new Map();
-  indicatorCheckboxedChecked.forEach((indicatorCheckbox) => {
+  indicatorCheckboxesChecked.forEach((indicatorCheckbox) => {
     const indicatorCode = indicatorCheckbox.getAttribute('code');
 
     const url = `/completenessTuples/${indicatorCode}/${minYear}/${maxYear}`;
@@ -124,7 +124,7 @@ function updateView() {
       })
       .then(() => {
         countryCompletenesses.forEach((countryCompleteness) => {
-          const countryName = countryCompleteness.getAttribute('name');
+          const countryName = countryCompleteness.getAttribute('callsign');
           const newCountryCompleteness = countryCompleteness;
 
           if (completenessMap.has(countryName)) {
@@ -138,12 +138,12 @@ function updateView() {
 
   if (countryCheckboxesChecked.length === 0) { return; }
 
-  indicatorCheckboxedChecked.forEach((indicatorCheckbox) => {
+  indicatorCheckboxesChecked.forEach((indicatorCheckbox) => {
     const indicatorCode = indicatorCheckbox.getAttribute('code');
-    const indicatorName = indicatorCheckbox.getAttribute('name');
+    const indicatorName = indicatorCheckbox.getAttribute('callsign');
 
     let url = `/graphTuples/${indicatorCode}/${minYear}/${maxYear}`;
-    countryCheckboxesChecked.forEach((countryDropdown) => { url += `/${countryDropdown.getAttribute('name')}`; });
+    countryCheckboxesChecked.forEach((countryDropdown) => { url += `/${countryDropdown.getAttribute('callsign')}`; });
     const graphData = [];
 
     fetch(url)
@@ -164,7 +164,7 @@ function updateView() {
         graphData.push(constructGraph(graphMap, indicatorName));
       })
       .then(() => {
-        if (graphData.length >= indicatorCheckboxedChecked.length) {
+        if (graphData.length >= indicatorCheckboxesChecked.length) {
           removeGraphs();
 
           graphData.forEach((graphDatum) => {

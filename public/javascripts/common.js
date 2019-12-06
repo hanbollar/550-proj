@@ -26,7 +26,7 @@ function populateNavBar() {
 
   const title = document.createElement('span');
   title.className = 'navbar-brand center';
-  title.innerHTML = 'CIS550 Project';
+  title.innerHTML = 'WorldStats';
   nav.appendChild(title);
 
   const outerContainer = document.createElement('div');
@@ -55,13 +55,8 @@ function populateNavBar() {
   graphs.href = '/graphs';
   graphs.innerHTML = 'Country Graphs';
   innerContainer.appendChild(graphs);
-
-  const facts = document.createElement('a');
-  facts.className = 'nav-item nav-link';
-  facts.href = '/facts';
-  facts.innerHTML = 'Country Facts';
-  innerContainer.appendChild(facts);
 }
+
 function filterBoxes(
   boxClass,
   checkOrRadioClass,
@@ -93,7 +88,7 @@ function filterBoxes(
     const boxNew = box;
     const checkOrRadio = boxNew.getElementsByClassName(checkOrRadioClass)[0];
 
-    const inViaSearchFilter = boxNew.getAttribute('name').toLowerCase().includes(searchFilter.value.toLowerCase());
+    const inViaSearchFilter = boxNew.getAttribute('callsign').toLowerCase().includes(searchFilter.value.toLowerCase());
     const inViaCheckedFilter = checkOrRadio.checked;
     let inViaCompletenessFilter;
 
@@ -137,4 +132,18 @@ function filterIndicatorBoxes() {
 // eslint-disable-next-line no-unused-vars
 function filterCountryBoxes() {
   filterBoxes('countryBox', 'countryCheckbox', 'countryCompleteness', 'countrySearchFilter', 'countryCheckedFilter', 'countryCompletenessFilter', 'countryCompletenessFilterLabel');
+}
+
+// eslint-disable-next-line no-unused-vars
+function filterPrimaryIndicatorBoxes() {
+  filterBoxes('primaryIndicatorBox', 'primaryIndicatorRadioButton', null, 'primaryIndicatorSearchFilter', 'primaryIndicatorCheckedFilter', null, null);
+}
+
+// eslint-disable-next-line no-unused-vars
+function filterSecondaryIndicatorBoxes() {
+  filterBoxes('secondaryIndicatorBox', 'secondaryIndicatorRadioButton', null, 'secondaryIndicatorSearchFilter', 'secondaryIndicatorCheckedFilter', null, null);
+}
+
+function filterTertiaryIndicatorBoxes() {
+  filterBoxes('tertiaryIndicatorBox', 'tertiaryIndicatorCheckbox', null, 'tertiaryIndicatorSearchFilter', 'tertiaryIndicatorCheckedFilter', null, null);
 }

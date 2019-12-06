@@ -10,34 +10,94 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
     <script src="javascripts/app.js" type="text/javascript"></script>
     <script src="javascripts/common.js" type="text/javascript"></script>
+    <script src="javascripts/cards.js" type="text/javascript"></script>
     <link href="/stylesheets/common.css" rel="stylesheet">
     <link href="/stylesheets/cards.css" rel="stylesheet">
   </head>
 
-  <body onload="populateNavBar();">
+  <body onload="populateNavBar(); resetControls();">
     <nav id="nav"></nav>
 
-    <div ng-controller="indicatorsController">
-      <div ng-controller="cardsController" ng-model="cards">
-        <select class="dropdown" ng-model="indicatorSelected" ng-change="changedInput(indicatorSelected, minYearSelected, maxYearSelected)" data-ng-options="indicator as indicator.name for indicator in indicators">
-          <option value="">Select an indicator...</option>
-        </select>
+    <div ng-controller="countriesController">
+      <div ng-controller="indicatorsController">
+        <div id="outerContainer">
 
-        <br />
+          <div class="input-group mb-0">
+            <div class="input-group-prepend">
+              <label class="input-group-text" for="modeDropdown">Select mode:</label>
+            </div>
+            <select class="custom-select" id="modeDropdown" onchange="resetControls(); removeCards();">
+              <option value="increase">Greatest increase over time range</option>
+              <option value="yoy">Greatest year-over-year increase within time range</option>
+              <option value="yoyPairs">Greatest year-over-year relative increase within time range</option>
+            </select>
+          </div>
+    
+          <div id="controlsContainer">
 
-        <div class="outer-container">
-          <div class="inner-container">
-            <div class="outer-box" ng-repeat="c in cards">
-              <div class="inner-box" >
-              <img src="{{'../assets/flag_images/' + ((c.name.split(' ').join('')) | lowercase) + '.png'}}" onerror="this.onerror=null; this.src='../assets/flag_images/blank.png';"></img>
-                <br /><br /><p></p><p></p><p></p>
-                <p><i><b ng-class="({{c.percentage_change | number: 2}} >= 0.01) ? 'green-class' : {{c.percentage_change | number: 2}} <= -0.01 ? 'red-class' : 'white-class'">{{(c.percentage_change | number: 2) + '%'}}</b></i> <br/> 
-                {{c.name}}
-                </p>
+            <div id="primaryIndicatorControls" class="controls">
+              <input id="primaryIndicatorSearchFilter" type="text" class="searchFilter form-control" oninput="filterPrimaryIndicatorBoxes();" placeholder="Filter indicators...">
+              <input id="primaryIndicatorCheckedFilter" class="checkedFilter" type="checkbox" oninput="filterPrimaryIndicatorBoxes();"> Only show checked
+  
+              <div id="primaryIndicatorBoxes" class="boxes">
+                <div ng-repeat="i in indicators">
+                  <div class="box primaryIndicatorBox" callsign="{{i.name}}">
+                    <input class="boxElement indicatorCheckbox primaryIndicatorRadioButton" type="radio" name="primaryIndicatorRadioButton" callsign="{{i.name}}" code="{{i.code}}" onchange="updateView();" />
+                    <span class="boxElement">{{i.name}}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div id="secondaryIndicatorControls" class="controls" style="display:none;">
+              <input id="secondaryIndicatorSearchFilter" type="text" class="searchFilter form-control" oninput="filterSecondaryIndicatorBoxes();" placeholder="Filter indicators...">
+              <input id="secondaryIndicatorCheckedFilter" class="checkedFilter" type="checkbox" oninput="filterSecondaryIndicatorBoxes();"> Only show checked
+  
+              <div id="secondaryIndicatorBoxes" class="boxes">
+                <div ng-repeat="i in indicators">
+                  <div class="box secondaryIndicatorBox" callsign="{{i.name}}">
+                    <input class="boxElement indicatorCheckbox secondaryIndicatorRadioButton" type="radio" name="secondaryIndicatorRadioButton" callsign="{{i.name}}" code="{{i.code}}" onchange="updateView();" />
+                    <span class="boxElement">{{i.name}}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+    
+            <div id="tertiaryIndicatorControls" class="controls" style="display:none;">
+              <input id="tertiaryIndicatorSearchFilter" type="text" class="searchFilter form-control" oninput="filterTertiaryIndicatorBoxes();" placeholder="Filter indicators...">
+              <input id="tertiaryIndicatorCheckedFilter" class="checkedFilter" type="checkbox" oninput="filterTertiaryIndicatorBoxes();"> Only show checked
+  
+              <div id="tertiaryIndicatorBoxes" class="boxes">
+                <div ng-repeat="i in indicators">
+                  <div class="box tertiaryIndicatorBox" callsign="{{i.name}}">
+                    <input class="boxElement indicatorCheckbox tertiaryIndicatorCheckbox" type="checkbox" callsign="{{i.name}}" code="{{i.code}}" onchange="updateView();" />
+                    <span class="boxElement">{{i.name}}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+              
+            <div id="minYearControls" class="controls">
+              <div>
+                <input id="minYearSlider" type="range" orient="vertical" min="1960" max="2020" value="1960" oninput="updateView();">
+                <span id="minYearLabel">1960</span>
+              </div>
+            </div>
+    
+            <div id="maxYearControls" class="controls">
+              <div>
+                <input id="maxYearSlider" type="range" orient="vertical" min="1960" max="2020" value="2020" oninput="updateView();">
+                <span id="maxYearLabel">2020</span>
               </div>
             </div>
           </div>
         </div>
+      </div>
+
+      <div id="hider" onclick="toggleShowControls();">&uarr;</div>
+
+      <div id="cardsContainer">
+        <!--Cards will be added here.-->
       </div>
     </div>
 

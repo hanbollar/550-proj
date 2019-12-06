@@ -17,7 +17,7 @@
     <link href="/stylesheets/graphs.css" rel="stylesheet">
   </head>
 
-  <body onload="populateNavBar(); resetInputs();">
+  <body onload="populateNavBar(); resetControls();">
     <nav id="nav"></nav>
 
     <div ng-controller="countriesController">
@@ -28,10 +28,10 @@
             <input id="indicatorSearchFilter" type="text" class="searchFilter form-control" oninput="filterIndicatorBoxes();" placeholder="Filter indicators...">
             <input id="indicatorCheckedFilter" class="checkedFilter" type="checkbox" oninput="filterIndicatorBoxes();"> Only show checked
 
-            <div id="indicatorBoxes" class="boxes" ng-model="indicatorSelected">
+            <div id="indicatorBoxes" class="boxes">
               <div ng-repeat="i in indicators">
-                <div class="box indicatorBox" name="{{i.name}}">
-                  <input class="boxElement indicatorCheckbox" type="checkbox" name="{{i.name}}" code="{{i.code}}" onchange="updateView();" />
+                <div class="box indicatorBox" callsign="{{i.name}}">
+                  <input class="boxElement indicatorCheckbox" type="checkbox" callsign="{{i.name}}" code="{{i.code}}" onchange="updateView();" />
                   <span class="boxElement">{{i.name}}</span>
                 </div>
               </div>
@@ -46,13 +46,13 @@
               <input id="countryCompletenessFilter" type="range" min="0" max="100" value="0" oninput="filterCountryBoxes();">
             </div>
 
-            <div id="countryBoxes" class="boxes" ng-model="countrySelected">
+            <div id="countryBoxes" class="boxes">
               <div ng-repeat="c in countries">
-                <div class="box countryBox" name="{{c.name}}">
-                  <input class="boxElement countryCheckbox" type="checkbox" name="{{c.name}}" onchange="updateView();" />
+                <div class="box countryBox" callsign="{{c.name}}">
+                  <input class="boxElement countryCheckbox" type="checkbox" callsign="{{c.name}}" onchange="updateView();" />
                   <span class="boxElement countryCompletenessBox">
                     <div>[</div>
-                    <div class="countryCompleteness" name="{{c.name}}"></div>
+                    <div class="countryCompleteness" callsign="{{c.name}}"></div>
                     <div>%]</div>
                   </span>
                   <span class="boxElement">{{c.name}}</span>

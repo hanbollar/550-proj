@@ -1,83 +1,61 @@
-.outer-container {
-  display: flex;
-  flex-direction: row;
-  flex: 0 0 100%;
-  width: 100%;
-  align-items: center;
-  justify-content: center;
+#outerContainer {
+  background: white;
 }
 
-.inner-container {
+#primaryIndicatorControls {
+  width: 50%;
+}
+
+#secondaryIndicatorControls {
+  width: 50%;
+}
+
+#tertiaryIndicatorControls {
+  width: 50%;
+}
+
+#cardsContainer {
   display: flex;
   flex-direction: row;
-  flex: 0 1 1200px;
-  align-items: stretch;
+  flex: 0 1 100%;
   justify-content: center;
   flex-wrap: wrap;
 }
 
-.outer-box {
+.outerCard {
   display: flex;
   flex-direction: column;
-  flex: 0 0 150px;
-  height: 200px;
-	align-items: center;
-	justify-content: center;
+  flex: 0 0 300px;
+  align-items: center;
+  justify-content: center;
   background-color: rgba(255, 255, 255, 0.1);
   margin: 10px;
   border-radius: 10px;
   overflow: hidden;
+}
+
+.innerCard {
+  display: flex;
+  flex-direction: column;
+  width: 90%;
+  height: 90%;
+  align-items: center;
+  justify-content: stretch;
+  margin: 10px;
+  overflow: hidden;
   color: white;
 }
 
-.mine {
-  overflow:hidden;
+.flag {
+  max-width: 300px;
+  max-height: 200px;
+  margin-bottom: 10px;
 }
 
-.inner-box {
+.cardText {
   display: flex;
   flex-direction: column;
-	flex: 1 1 100%;
-	align-items: center;
-  vertical-align: top;
-  text-align: center;
-  margin: 10px;
-  overflow: hidden;
-  height: 100%;
-}
-
-.inner-box img {
-  max-height: 60%;
-  width:110%;
-  float:top;
-}
-
-.inner-box p {
-  float: bottom;
-  margin: 2px;
-  font-size: 80%;
-  position: absolute;
-  padding-top: 120px;
-  width: 6%;
-}
-
-.inner-box p i {
-  font-size: 125%;
-}
-
-.green-class {
-  color: rgb(0,255,10);
-}
-
-.red-class {
-  color: rgb(255,30,0);
-}
-
-.white-class {
-  color: rgb(250,250,250);
-}
-
-.dropdown {
-  width: 400px;
-  margin: 10px;
+  align-items: center;
+  justify-content: center;
+  color: white;
 }

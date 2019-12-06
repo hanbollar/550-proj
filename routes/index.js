@@ -24,10 +24,6 @@ router.get('/graphs', (req, res) => {
   res.sendFile(path.join(__dirname, '../', 'views', 'graphs.html'));
 });
 
-router.get('/facts', (req, res) => {
-  res.sendFile(path.join(__dirname, '../', 'views', 'facts.html'));
-});
-
 router.get('/countryTuples', (req, res) => {
   const query = `
     SELECT *
@@ -57,7 +53,7 @@ router.get('/indicatorTuples', (req, res) => {
   });
 });
 
-router.get('/cardTuples/:indicator/:minYear/:maxYear', (req, res) => {
+router.get('/increaseTuples/:indicator/:minYear/:maxYear', (req, res) => {
   if (!req.params.indicator || req.params.indicator === '') { res.sendStatus(400); return; }
   if (!req.params.minYear || req.params.minYear === '') { res.sendStatus(400); return; }
   if (!req.params.maxYear || req.params.maxYear === '') { res.sendStatus(400); return; }
@@ -107,7 +103,99 @@ router.get('/cardTuples/:indicator/:minYear/:maxYear', (req, res) => {
   console.log(query);
 
   connection.query(query, (err, rows) => {
-    if (err) console.log(`[!] /cardTuples route: ${err}`);
+    if (err) console.log(`[!] /increaseTuples route: ${err}`);
+    else {
+      res.json(rows);
+    }
+  });
+});
+
+router.get('/yoyTuples/:indicator/:minYear/:maxYear', (req, res) => {
+  if (!req.params.indicator || req.params.indicator === '') { res.sendStatus(400); return; }
+  if (!req.params.minYear || req.params.minYear === '') { res.sendStatus(400); return; }
+  if (!req.params.maxYear || req.params.maxYear === '') { res.sendStatus(400); return; }
+  if (req.params.minYear > req.params.maxYear) { res.sendStatus(400); return; }
+
+  const query = `
+    WITH year_over_year_changes AS (
+      SELECT  istart.cid,
+              istart.year                                      AS start_year,
+              iend.year                                        AS end_year,
+              ((iend.value - istart.value) / istart.value)     AS percentage_change
+      FROM    ${req.params.indicator} istart
+      JOIN    ${req.params.indicator} iend
+      ON      iend.cid = istart.cid
+      WHERE   iend.year = istart.year + 1
+      AND     istart.year >= ${req.params.minYear}
+      AND     istart.year <= ${req.params.maxYear}
+      AND     iend.year >= ${req.params.minYear}
+      AND     iend.year <= ${req.params.maxYear} )
+    SELECT    c.name,
+              yoyc.start_year,
+              yoyc.end_year,
+              max(yoyc.percentage_change) AS percentage_change
+    FROM      year_over_year_changes yoyc
+    JOIN      Country c
+    ON        c.cid = yoyc.cid
+    GROUP BY  yoyc.cid,
+              yoyc.percentage_change,
+              yoyc.start_year,
+              yoyc.end_year
+    ORDER BY  yoyc.percentage_change DESC;`;
+
+  console.log(query);
+
+  connection.query(query, (err, rows) => {
+    if (err) console.log(`[!] /yoyTuples route: ${err}`);
+    else {
+      res.json(rows);
+    }
+  });
+});
+
+router.get('/yoyPairTuples/:indicatorNumerator/:indicatorDenominator/:minYear/:maxYear', (req, res) => {
+  if (!req.params.indicatorNumerator || req.params.indicatorNumerator === '') { res.sendStatus(400); return; }
+  if (!req.params.indicatorDenominator || req.params.indicatorDenominator === '') { res.sendStatus(400); return; }
+  if (!req.params.minYear || req.params.minYear === '') { res.sendStatus(400); return; }
+  if (!req.params.maxYear || req.params.maxYear === '') { res.sendStatus(400); return; }
+  if (req.params.minYear > req.params.maxYear) { res.sendStatus(400); return; }
+
+  const query = `
+    WITH year_over_year_changes AS (
+      SELECT    i1start.cid,
+                i1start.year    AS start_year,
+                i1end.year      AS end_year,
+                ((i1end.value / i2end.value) - (i1start.value / i2start.value)) / (i1start.value / i2start.value) AS percentage_change
+      FROM      ${req.params.indicatorNumerator} i1start
+      JOIN      ${req.params.indicatorNumerator} i1end
+      ON        i1end.cid = i1start.cid
+      JOIN      ${req.params.indicatorDenominator} i2start
+      ON        i2start.cid = i1start.cid
+      JOIN      ${req.params.indicatorDenominator} i2end
+      ON        i2end.cid = i1start.cid
+      WHERE     i1start.year = i2start.year
+      AND       i1end.year = i2end.year
+      AND       i1end.year = i1start.year + 1
+      AND       i1start.year >= ${req.params.minYear}
+      AND       i1start.year <= ${req.params.maxYear}
+      AND       i1end.year >= ${req.params.minYear}
+      AND       i1end.year <= ${req.params.maxYear} )
+    SELECT    c.name,
+              yoyc.start_year,
+              yoyc.end_year,
+              max(yoyc.percentage_change) AS percentage_change
+    FROM      year_over_year_changes yoyc
+    JOIN      Country c
+    ON        c.cid = yoyc.cid
+    GROUP BY  yoyc.cid,
+              yoyc.start_year,
+              yoyc.end_year
+    ORDER BY  yoyc.percentage_change DESC;`;
+
+  console.log(query);
+
+  connection.query(query, (err, rows) => {
+    if (err) console.log(`[!] /yoyPairTuples route: ${err}`);
     else {
       res.json(rows);
     }
@@ -163,84 +251,6 @@ router.get('/graphTuples/*', (req, res) => {
 
   connection.query(query, (err, rows) => {
     if (err) console.log(`[!] /graphTuples route: ${err}`);
-    else {
-      res.json(rows);
-    }
-  });
-});
-
-router.get('/yoyTuples/:indicator', (req, res) => {
-  if (!req.params.indicator || req.params.indicator === '') { res.sendStatus(400); return; }
-
-  const query = `
-    WITH year_over_year_changes AS (
-      SELECT  istart.cid,
-              istart.year                                      AS start_year,
-              iend.year                                        AS end_year,
-              ((iend.value - istart.value) / istart.value)     AS percentage_change
-      FROM    ${req.params.indicator} istart
-      JOIN    ${req.params.indicator} iend
-      ON      iend.cid = istart.cid
-      WHERE   iend.year = istart.year + 1 )
-    SELECT    c.name,
-              yoyc.start_year,
-              yoyc.end_year,
-              max(yoyc.percentage_change) AS percentage_change
-    FROM      year_over_year_changes yoyc
-    JOIN      Country c
-    ON        c.cid = yoyc.cid
-    GROUP BY  yoyc.cid,
-              yoyc.percentage_change,
-              yoyc.start_year,
-              yoyc.end_year
-    ORDER BY  yoyc.percentage_change DESC;`;
-
-  console.log(query);
-
-  connection.query(query, (err, rows) => {
-    if (err) console.log(`[!] /yoyTuples route: ${err}`);
-    else {
-      res.json(rows);
-    }
-  });
-});
-
-router.get('/yoyPairTuples/:indicatorNumerator/:indicatorDenominator', (req, res) => {
-  if (!req.params.indicatorNumerator || req.params.indicatorNumerator === '') { res.sendStatus(400); return; }
-  if (!req.params.indicatorDenominator || req.params.indicatorDenominator === '') { res.sendStatus(400); return; }
-
-  const query = `
-    WITH year_over_year_changes AS (
-      SELECT    i1start.cid,
-                i1start.year    AS start_year,
-                i1end.year      AS end_year,
-                ((i1end.value / i2end.value) - (i1start.value / i2start.value)) / (i1start.value / i2start.value) AS percentage_change
-      FROM      ${req.params.indicatorNumerator} i1start
-      JOIN      ${req.params.indicatorNumerator} i1end
-      ON        i1end.cid = i1start.cid
-      JOIN      ${req.params.indicatorDenominator} i2start
-      ON        i2start.cid = i1start.cid
-      JOIN      ${req.params.indicatorDenominator} i2end
-      ON        i2end.cid = i1start.cid
-      WHERE     i1start.year = i2start.year
-      AND       i1end.year = i1start.year + 1
-      AND       i2end.year = i2start.year + 1 )
-    SELECT    c.name,
-              yoyc.start_year,
-              yoyc.end_year,
-              max(yoyc.percentage_change) AS percentage_change
-    FROM      year_over_year_changes yoyc
-    JOIN      Country c
-    ON        c.cid = yoyc.cid
-    GROUP BY  yoyc.cid,
-              yoyc.start_year,
-              yoyc.end_year
-    ORDER BY  yoyc.percentage_change DESC;`;
-
-  console.log(query);
-
-  connection.query(query, (err, rows) => {
-    if (err) console.log(`[!] /yoyPairTuples route: ${err}`);
     else {
       res.json(rows);
     }
