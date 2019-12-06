@@ -1,7 +1,11 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable max-len */
 /* globals document fetch Plotly */
 
-// eslint-disable-next-line no-unused-vars
+/**
+ * Resets the user controls to their default state.
+ * Search filters are cleared, checkboxes are unchecked, etc.
+ */
 function resetControls() {
   const indicatorSearchFilter = document.getElementById('indicatorSearchFilter');
   const indicatorCheckedFilter = document.getElementById('indicatorCheckedFilter');
@@ -20,6 +24,9 @@ function resetControls() {
   maxYearSlider.value = maxYearSlider.max;
 }
 
+/**
+ * Removes all displayed graphs.
+ */
 function removeGraphs() {
   const graphsContainer = document.getElementById('graphsContainer');
 
@@ -31,6 +38,10 @@ function removeGraphs() {
   }
 }
 
+/**
+ * Constructs a graph for a single indicator.
+ * Can accept data series for multiple countries.
+ */
 function constructGraph(graphMap, indicatorName) {
   const dataSeries = [];
 
@@ -50,7 +61,18 @@ function constructGraph(graphMap, indicatorName) {
   return { dataSeries, layout };
 }
 
-// eslint-disable-next-line no-unused-vars
+/**
+ * Renders graphs based on the user-selected parameters.
+ * For each indicator, renders multiple countries' data on the same graph.
+ *
+ * Additionally, marks countries in the user interface with information about data completeness.
+ *
+ * For example, if a user has selected Indicator X, every country in the user interface
+ * will be marked with a percentage indicating how much data is available for that country
+ * on Indicator X within the selected time range.
+ *
+ * If multiple indicators are selected, data-completeness values will be averaged.
+ */
 function updateView() {
   removeGraphs();
 
@@ -101,6 +123,7 @@ function updateView() {
 
     const url = `/completenessTuples/${indicatorCode}/${minYear}/${maxYear}`;
 
+    // Get completeness data for the indicator.
     fetch(url)
       .then((res) => res.json())
       .then((json) => {
@@ -129,6 +152,7 @@ function updateView() {
           });
         });
       })
+      // Display average completeness data for all indicators.
       .then(() => {
         countryCompletenesses.forEach((countryCompleteness) => {
           const countryName = countryCompleteness.getAttribute('callsign');
@@ -143,9 +167,13 @@ function updateView() {
       });
   });
 
+  // If no countries are selected, no graphs can be rendered.
+  // Therefore, terminate early.
   if (countryCheckboxesChecked.length === 0) { return; }
-  const graphData = [];
 
+  // Store the graph data in an array
+  // and display it only after all server requests complete.
+  const graphData = [];
   indicatorCheckboxesChecked.forEach((indicatorCheckbox) => {
     const indicatorCode = indicatorCheckbox.getAttribute('code');
     const indicatorName = indicatorCheckbox.getAttribute('callsign');
@@ -153,6 +181,7 @@ function updateView() {
     let url = `/graphTuples/${indicatorCode}/${minYear}/${maxYear}`;
     countryCheckboxesChecked.forEach((countryDropdown) => { url += `/${countryDropdown.getAttribute('callsign')}`; });
 
+    // Get time-series data for the indicator.
     fetch(url)
       .then((res) => res.json())
       .then((json) => {
@@ -170,6 +199,7 @@ function updateView() {
 
         graphData.push(constructGraph(graphMap, indicatorName));
 
+        // If all server requests have completed, display the graphs.
         if (graphData.length >= indicatorCheckboxesChecked.length) {
           removeGraphs();
 

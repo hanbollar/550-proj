@@ -1,7 +1,81 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable no-use-before-define */
 /* eslint-disable max-len */
 /* globals document fetch */
 
-// eslint-disable-next-line no-unused-vars
+/**
+ * Renders cards based on the user-selected parameters.
+ * Passes control to the appropriate function for the selected mode
+ * (i.e., increase, yoy, or yoyPairs).
+ *
+ * Note the following terminology used throughout the "cards" scripts:
+ *
+ * 1. Primary indicator: Only one may be selected.
+ * 2. Secondary indicator: Only one may be selected.
+ * 3. Tertiary indicator: Any number may be selected.
+ *
+ * This standard is maintained throughout,
+ * in order to ensure the controls for the selected mode
+ * map to the data that will be processed.
+ *
+ * The "increase" mode uses primary and tertiary indicators.
+ * The "yoy" mode uses only a primary indicator.
+ * The "yoyPairs" mode uses primary and secondary indicators.
+ */
+function updateView() {
+  const modeDropdown = document.getElementById('modeDropdown');
+  const mode = modeDropdown.options[modeDropdown.selectedIndex].value;
+
+  const minYearSlider = document.getElementById('minYearSlider');
+  const maxYearSlider = document.getElementById('maxYearSlider');
+
+  let minYear = minYearSlider.value;
+  let maxYear = maxYearSlider.value;
+
+  const minYearLabel = document.getElementById('minYearLabel');
+  const maxYearLabel = document.getElementById('maxYearLabel');
+
+  minYearLabel.innerHTML = minYear;
+  maxYearLabel.innerHTML = maxYear;
+
+  if (minYear > maxYear) {
+    const temp = minYear;
+    minYear = maxYear;
+    maxYear = temp;
+  }
+
+  // Call the correct card-creator function for the selected mode
+  // (i.e., increase, yoy, or yoyPairs).
+  if (mode === 'increase') {
+    createIncreaseCards(minYear, maxYear);
+  } else if (mode === 'yoy') {
+    createYoyCards(minYear, maxYear);
+  } else if (mode === 'yoyPairs') {
+    createYoyPairsCards(minYear, maxYear);
+  }
+}
+
+/**
+ * Removes all displayed cards.
+ */
+function removeCards() {
+  const cardsContainer = document.getElementById('cardsContainer');
+
+  let child = cardsContainer.lastElementChild;
+
+  while (child) {
+    cardsContainer.removeChild(child);
+    child = cardsContainer.lastElementChild;
+  }
+}
+
+/**
+ * Resets the user controls to their default state.
+ * Search filters are cleared, checkboxes are unchecked, etc.
+ *
+ * Displays the correct indicator controls for the selected mode
+ * (i.e., increase, yoy, or yoyPairs).
+ */
 function resetControls() {
   const primaryIndicatorSearchFilter = document.getElementById('primaryIndicatorSearchFilter');
   const primaryIndicatorCheckedFilter = document.getElementById('primaryIndicatorCheckedFilter');
@@ -36,6 +110,8 @@ function resetControls() {
   const modeDropdown = document.getElementById('modeDropdown');
   const mode = modeDropdown.options[modeDropdown.selectedIndex].value;
 
+  // Display the correct indicator controls for the selected mode
+  // (i.e., increase, yoy, or yoyPairs).
   if (mode === 'increase') {
     primaryIndicatorControls.removeAttribute('style');
     secondaryIndicatorControls.style.display = 'none';
@@ -60,18 +136,10 @@ function resetControls() {
   }
 }
 
-// eslint-disable-next-line no-unused-vars
-function removeCards() {
-  const cardsContainer = document.getElementById('cardsContainer');
-
-  let child = cardsContainer.lastElementChild;
-
-  while (child) {
-    cardsContainer.removeChild(child);
-    child = cardsContainer.lastElementChild;
-  }
-}
-
+/**
+ * Displays a message indicating that there are no cards to display,
+ * given the parameters provided.
+ */
 function showNoCardsMessage(show) {
   const noCardsMessage = document.getElementById('noCardsMessage');
 
@@ -82,6 +150,10 @@ function showNoCardsMessage(show) {
   }
 }
 
+/**
+ * Converts a percentage value (e.g., 0.55) to a string
+ * that is specially formatted to display the percentage (e.g., with text and color).
+ */
 function displayPercentage(number) {
   const percentage = (number * 100).toFixed(2);
 
@@ -96,6 +168,15 @@ function displayPercentage(number) {
   return '<h4>0% increase</h4>';
 }
 
+/**
+ * Updates the view if the mode is set to "increase."
+ *
+ * For the selected primary indicator, determines the magnitude of the change
+ * for every country in the dataset over the selected time range.
+ * Sorts the cards by the magnitude in descending order.
+ *
+ * Optionally, the user may select more ("tertiary") indicators to display on each card as well.
+ */
 function createIncreaseCards(minYear, maxYear) {
   const cardsContainer = document.getElementById('cardsContainer');
 
@@ -125,19 +206,20 @@ function createIncreaseCards(minYear, maxYear) {
   let url = `/increaseTuples/${primaryIndicatorCode}/${minYear}/${maxYear}`;
   const defaultImgSrc = '../assets/flag_images/blank.png';
 
+  // Get data for the primary indicator.
   fetch(url)
     .then((res) => res.json())
-    .then((json) => {
+    .then((primaryIndicatorTuples) => {
       removeCards();
 
-      if (json.length > 0) {
+      if (primaryIndicatorTuples.length > 0) {
         showNoCardsMessage(false);
       } else {
         showNoCardsMessage(true);
       }
 
       // For each tuple in the primary indicator data, create a card.
-      json.forEach((tuple) => {
+      primaryIndicatorTuples.forEach((tuple) => {
         const outerCard = document.createElement('div');
         outerCard.className = 'outerCard';
         cardsContainer.appendChild(outerCard);
@@ -157,18 +239,22 @@ function createIncreaseCards(minYear, maxYear) {
         cardText.className = 'cardText';
         innerCard.appendChild(cardText);
 
+        // We do not need to add tertiary data.
+        // Display the card right away.
         if (tertiaryIndicatorCheckboxesChecked.length === 0) {
           cardText.innerHTML = `
-          <h3>${tuple.name}</h3><br />
-          ${primaryIndicatorName}<br />
-          ${displayPercentage(tuple.percentage_change)}<br />
-          <small class="yearRange">${minYear}-${maxYear}</small><br />`;
-        // We need to add tertiary data. Hide the card until that step is complete.
+            <h3>${tuple.name}</h3><br />
+            ${primaryIndicatorName}<br />
+            ${displayPercentage(tuple.percentage_change)}<br />
+            <small class="yearRange">${minYear}-${maxYear}</small><br />`;
+        // We need to add tertiary data.
+        // Hide the card until that step is complete.
         } else {
           innerCard.style.display = 'none';
         }
 
-        // Map the card so it can be retrieved when tertiary data is added.
+        // Map the card element and its data
+        // so tertiary data can be added to it later.
         cardsMap.set(tuple.name, {
           innerCard,
           cardText,
@@ -184,20 +270,29 @@ function createIncreaseCards(minYear, maxYear) {
         const tertiaryIndicatorCode = tertiaryIndicatorCheckboxChecked.getAttribute('code');
         const tertiaryIndicatorName = tertiaryIndicatorCheckboxChecked.getAttribute('callsign');
 
+        // Build the table of data for the tertiary indicator,
+        // but don't display it on the cards yet.
+        // The data should only be displayed once all server requests complete.
         const newTertiaryIndicatorTable = { indicatorName: tertiaryIndicatorName, tuples: [] };
 
         url = `/increaseTuples/${tertiaryIndicatorCode}/${minYear}/${maxYear}`;
 
+        // Get data for the tertiary indicator.
         fetch(url)
           .then((res) => res.json())
-          .then((json) => {
-            json.forEach((tuple) => {
-              newTertiaryIndicatorTable.tuples.push({ countryName: tuple.name, tertiaryChange: tuple.percentage_change });
+          .then((tertiaryIndicatorTuples) => {
+            // Populate the table for this tertiary indicator.
+            tertiaryIndicatorTuples.forEach((tuple) => {
+              newTertiaryIndicatorTable.tuples.push({
+                countryName: tuple.name,
+                tertiaryChange: tuple.percentage_change,
+              });
             });
 
+            // Add this tertiary indicator to the array of indicators that will be added to cards.
             tertiaryIndicatorTables.push(newTertiaryIndicatorTable);
 
-            // If this was the last tertiary data table to be processed, proceed to displaying everything.
+            // If this was the last tertiary data table to be processed, proceed to displaying the cards.
             if (tertiaryIndicatorTables.length >= tertiaryIndicatorCheckboxesChecked.length) {
               // Add the tertiary data to each card's entry in the map.
               tertiaryIndicatorTables.forEach((tertiaryIndicatorTable) => {
@@ -213,15 +308,15 @@ function createIncreaseCards(minYear, maxYear) {
                 });
               });
 
-              // Display all of the data.
+              // Append all tertiary-indicator data to the cards that were constructed previously.
               cardsMap.forEach((card) => {
                 const cardNew = card;
                 cardNew.innerCard.removeAttribute('style');
 
                 let text = `
-                <h3>${card.countryName}</h3><br />
-                <span class="indicatorName">${primaryIndicatorName}</span><br />
-                ${displayPercentage(card.primaryChange)}`;
+                  <h3>${card.countryName}</h3><br />
+                  <span class="indicatorName">${primaryIndicatorName}</span><br />
+                  ${displayPercentage(card.primaryChange)}`;
 
                 cardNew.tertiaryChanges.forEach((tertiaryChange) => {
                   text += `<br /><span class="indicatorName">${tertiaryChange.indicatorName}</span><br />${displayPercentage(tertiaryChange.value)}`;
@@ -237,6 +332,12 @@ function createIncreaseCards(minYear, maxYear) {
     });
 }
 
+/**
+ * Updates the view if the mode is set to "yoy."
+ *
+ * For the selected indicator, computes the largest year-over-year change in that indicator for each country.
+ * Displays a card with this data for each country, sorted by magnitude in descending order.
+ */
 function createYoyCards(minYear, maxYear) {
   const cardsContainer = document.getElementById('cardsContainer');
 
@@ -262,17 +363,17 @@ function createYoyCards(minYear, maxYear) {
 
   fetch(url)
     .then((res) => res.json())
-    .then((json) => {
+    .then((tuples) => {
       removeCards();
 
-      if (json.length > 0) {
+      if (tuples.length > 0) {
         showNoCardsMessage(false);
       } else {
         showNoCardsMessage(true);
       }
 
       // For each tuple in the data, create a card.
-      json.forEach((tuple) => {
+      tuples.forEach((tuple) => {
         const outerCard = document.createElement('div');
         outerCard.className = 'outerCard';
         cardsContainer.appendChild(outerCard);
@@ -291,15 +392,21 @@ function createYoyCards(minYear, maxYear) {
         const cardText = document.createElement('div');
         cardText.className = 'cardText';
         cardText.innerHTML = `
-          <h3>${tuple.name}</h3><br />
-          <span class="indicatorName">${primaryIndicatorName}</span><br />
-          ${displayPercentage(tuple.percentage_change)}
-          between ${tuple.start_year} and ${tuple.end_year}`;
+            <h3>${tuple.name}</h3><br />
+            <span class="indicatorName">${primaryIndicatorName}</span><br />
+            ${displayPercentage(tuple.percentage_change)}
+            between ${tuple.start_year} and ${tuple.end_year}`;
         innerCard.appendChild(cardText);
       });
     });
 }
 
+/**
+ * Updates the view if the mode is set to "yoyPairs."
+ *
+ * For the selected indicator, computes the largest relative year-over-year change in that indicator for each country.
+ * That is, it computes the change in ratio between the primary indicator (the numerator) and the secondary indicator (the denominator).
+ */
 function createYoyPairsCards(minYear, maxYear) {
   const cardsContainer = document.getElementById('cardsContainer');
 
@@ -344,17 +451,17 @@ function createYoyPairsCards(minYear, maxYear) {
 
   fetch(url)
     .then((res) => res.json())
-    .then((json) => {
+    .then((tuples) => {
       removeCards();
 
-      if (json.length > 0) {
+      if (tuples.length > 0) {
         showNoCardsMessage(false);
       } else {
         showNoCardsMessage(true);
       }
 
       // For each tuple in the data, create a card.
-      json.forEach((tuple) => {
+      tuples.forEach((tuple) => {
         const outerCard = document.createElement('div');
         outerCard.className = 'outerCard';
         cardsContainer.appendChild(outerCard);
@@ -373,47 +480,15 @@ function createYoyPairsCards(minYear, maxYear) {
         const cardText = document.createElement('div');
         cardText.className = 'cardText';
         cardText.innerHTML = `
-          <h3>${tuple.name}</h3><br />
-          <strong>The ratio of</strong><br />
-          <span class="indicatorName">${primaryIndicatorName}</span><br />
-          <strong>relative to</strong><br />
-          <span class="indicatorName">${secondaryIndicatorName}</span><br />
-          <strong>experienced a</strong>
-          ${displayPercentage(tuple.percentage_change)}
-          <strong>between ${tuple.start_year} and ${tuple.end_year}</strong>`;
+            <h3>${tuple.name}</h3><br />
+            <strong>The ratio of</strong><br />
+            <span class="indicatorName">${primaryIndicatorName}</span><br />
+            <strong>relative to</strong><br />
+            <span class="indicatorName">${secondaryIndicatorName}</span><br />
+            <strong>experienced a</strong>
+            ${displayPercentage(tuple.percentage_change)}
+            <strong>between ${tuple.start_year} and ${tuple.end_year}</strong>`;
         innerCard.appendChild(cardText);
       });
     });
-}
-
-// eslint-disable-next-line no-unused-vars
-function updateView() {
-  const modeDropdown = document.getElementById('modeDropdown');
-  const mode = modeDropdown.options[modeDropdown.selectedIndex].value;
-
-  const minYearSlider = document.getElementById('minYearSlider');
-  const maxYearSlider = document.getElementById('maxYearSlider');
-
-  let minYear = minYearSlider.value;
-  let maxYear = maxYearSlider.value;
-
-  const minYearLabel = document.getElementById('minYearLabel');
-  const maxYearLabel = document.getElementById('maxYearLabel');
-
-  minYearLabel.innerHTML = minYear;
-  maxYearLabel.innerHTML = maxYear;
-
-  if (minYear > maxYear) {
-    const temp = minYear;
-    minYear = maxYear;
-    maxYear = temp;
-  }
-
-  if (mode === 'increase') {
-    createIncreaseCards(minYear, maxYear);
-  } else if (mode === 'yoy') {
-    createYoyCards(minYear, maxYear);
-  } else if (mode === 'yoyPairs') {
-    createYoyPairsCards(minYear, maxYear);
-  }
 }

@@ -1,10 +1,12 @@
-/* eslint-disable max-len */
 /* eslint-disable no-unused-vars */
-/* global document fetch */
+/* eslint-disable max-len */
+/* global document */
 
 let showControls = true;
 
-// eslint-disable-next-line no-unused-vars
+/**
+ * Toggles whether or not the user controls are displayed.
+ */
 function toggleShowControls() {
   showControls = !showControls;
 
@@ -20,7 +22,10 @@ function toggleShowControls() {
   }
 }
 
-// eslint-disable-next-line no-unused-vars
+/**
+ * Updates the labels for the date-range sliders,
+ * which indicate the selected years.
+ */
 function updateSliderLabels() {
   const minYearSlider = document.getElementById('minYearSlider');
   const maxYearSlider = document.getElementById('maxYearSlider');
@@ -35,6 +40,9 @@ function updateSliderLabels() {
   maxYearLabel.innerHTML = maxYear;
 }
 
+/**
+ * Constructs the navigation bar that appears at the top of every page.
+ */
 function populateNavBar() {
   const nav = document.getElementById('nav');
   nav.className = 'navbar navbar-expand-lg navbar-light bg-light';
@@ -72,6 +80,23 @@ function populateNavBar() {
   innerContainer.appendChild(graphs);
 }
 
+/**
+ * Applies filters to a user control box
+ * (i.e., either a list of indicators or a list of countries).
+ *
+ * There are three types of filters:
+ * 1. Search filter. Filters out options that don't match a search term.
+ * 2. Checked filter. Filters out options that are not checked.
+ * 3. Completeness filter. Filters out options that do not have a high enough data-completeness percentage.'
+ *
+ * @param {*} boxClass: The class of the elements that are to be hidden or shown based on the filters.
+ * @param {*} checkOrRadioClass: The class of the checkbox or radio button elements inside the boxes.
+ * @param {*} completenessClass: The class of the elements holding the completeness data for each box (can be null).
+ * @param {*} searchFilterId: The ID of the textbox where search terms can be entered.
+ * @param {*} checkedFilterId: The ID of the checkbox used to apply the "checked" filter.
+ * @param {*} completenessFilterId: The ID of the range slider used to apply the "completeness" filter (can be null).
+ * @param {*} completenessFilterLabelId: The ID of the range slider's label.
+ */
 function filterBoxes(
   boxClass,
   checkOrRadioClass,
@@ -88,6 +113,8 @@ function filterBoxes(
   let completenessFilterValue;
   let completenessFilterLabel;
 
+  // Not all controls use the completeness filter.
+  // Only initialize these values if the completeness filter is being used.
   if (completenessFilterId) {
     completenessFilter = document.getElementById(completenessFilterId);
     completenessFilterValue = completenessFilter.value;
@@ -99,6 +126,9 @@ function filterBoxes(
   const usingCheckedFilter = checkedFilter.checked;
   const usingCompletenessFilter = (completenessClass && completenessFilterId && completenessFilterValue > 0);
 
+  // Iterate over all boxes, showing them or hiding them based on
+  // the state of the data they hold
+  // compared against the state of the filters.
   boxes.forEach((box) => {
     const boxNew = box;
     const checkOrRadio = boxNew.getElementsByClassName(checkOrRadioClass)[0];
@@ -113,6 +143,7 @@ function filterBoxes(
 
     let shouldDisplay = false;
 
+    // Three possible filters. Eight cases to handle.
     if (usingSearchFilter && usingCheckedFilter && usingCompletenessFilter) {
       shouldDisplay = inViaSearchFilter && inViaCompletenessFilter;
     } else if (usingSearchFilter && usingCheckedFilter) {
@@ -139,26 +170,37 @@ function filterBoxes(
   });
 }
 
-// eslint-disable-next-line no-unused-vars
+/**
+ * Filters the indicator boxes on the "graphs" page.
+ */
 function filterIndicatorBoxes() {
   filterBoxes('indicatorBox', 'indicatorCheckbox', null, 'indicatorSearchFilter', 'indicatorCheckedFilter', null, null);
 }
 
-// eslint-disable-next-line no-unused-vars
+/**
+ * Filters the country boxes on the "graphs" page.
+ */
 function filterCountryBoxes() {
   filterBoxes('countryBox', 'countryCheckbox', 'countryCompleteness', 'countrySearchFilter', 'countryCheckedFilter', 'countryCompletenessFilter', 'countryCompletenessFilterLabel');
 }
 
-// eslint-disable-next-line no-unused-vars
+/**
+ * Filters the primary indicator boxes on the "cards" page.
+ */
 function filterPrimaryIndicatorBoxes() {
   filterBoxes('primaryIndicatorBox', 'primaryIndicatorRadioButton', null, 'primaryIndicatorSearchFilter', 'primaryIndicatorCheckedFilter', null, null);
 }
 
-// eslint-disable-next-line no-unused-vars
+/**
+ * Filters the secondary indicator boxes on the "cards" page.
+ */
 function filterSecondaryIndicatorBoxes() {
   filterBoxes('secondaryIndicatorBox', 'secondaryIndicatorRadioButton', null, 'secondaryIndicatorSearchFilter', 'secondaryIndicatorCheckedFilter', null, null);
 }
 
+/**
+ * Filters the tertiary indicator boxes on the "cards" page.
+ */
 function filterTertiaryIndicatorBoxes() {
   filterBoxes('tertiaryIndicatorBox', 'tertiaryIndicatorCheckbox', null, 'tertiaryIndicatorSearchFilter', 'tertiaryIndicatorCheckedFilter', null, null);
 }

@@ -2,6 +2,10 @@ h3 {
   text-align: center;
 }
 
+h4 {
+  margin-top: 10px;
+}
+
 #outerContainer {
   background: white;
 }

@@ -53,6 +53,13 @@ router.get('/indicatorTuples', (req, res) => {
   });
 });
 
+/**
+ * Returns data for the "increase" mode of the "cards" page.
+ *
+ * For the selected primary indicator, determines the magnitude of the change
+ * for every country in the dataset over the selected time range.
+ * Sorts the cards by the magnitude in descending order.
+ */
 router.get('/increaseTuples/:indicator/:minYear/:maxYear', (req, res) => {
   if (!req.params.indicator || req.params.indicator === '') { res.sendStatus(400); return; }
   if (!req.params.minYear || req.params.minYear === '') { res.sendStatus(400); return; }
@@ -110,6 +117,13 @@ router.get('/increaseTuples/:indicator/:minYear/:maxYear', (req, res) => {
   });
 });
 
+/**
+ * Returns data for the "yoy" mode of the "cards" page.
+ *
+ * For the selected indicator, computes the largest year-over-year change
+ * in that indicator for each country.
+ * Displays a card with this data for each country, sorted by magnitude in descending order.
+ */
 router.get('/yoyTuples/:indicator/:minYear/:maxYear', (req, res) => {
   if (!req.params.indicator || req.params.indicator === '') { res.sendStatus(400); return; }
   if (!req.params.minYear || req.params.minYear === '') { res.sendStatus(400); return; }
@@ -153,6 +167,14 @@ router.get('/yoyTuples/:indicator/:minYear/:maxYear', (req, res) => {
   });
 });
 
+/**
+ * Returns data for the "yoyPairs" mode of the "cards" page.
+ *
+ * For the selected indicator, computes the largest
+ * relative year-over-year change in that indicator for each country.
+ * That is, it computes the change in ratio between
+ * the primary indicator (the numerator) and the secondary indicator (the denominator).
+ */
 router.get('/yoyPairTuples/:indicatorNumerator/:indicatorDenominator/:minYear/:maxYear', (req, res) => {
   if (!req.params.indicatorNumerator || req.params.indicatorNumerator === '') { res.sendStatus(400); return; }
   if (!req.params.indicatorDenominator || req.params.indicatorDenominator === '') { res.sendStatus(400); return; }
@@ -202,6 +224,12 @@ router.get('/yoyPairTuples/:indicatorNumerator/:indicatorDenominator/:minYear/:m
   });
 });
 
+/**
+ * Returns graph data for the "graphs" page.
+ *
+ * Given an indicator, a date range, and any number of countries.
+ * Assembles time-series data for that range, which can be plotted on a graph.
+ */
 router.get('/graphTuples/*', (req, res) => {
   const params = req.params[0].split('/');
 
@@ -257,6 +285,13 @@ router.get('/graphTuples/*', (req, res) => {
   });
 });
 
+/**
+ * Returns completeness data for the "graphs" page.
+ *
+ * Given an indicator and a date range,
+ * computes how much data is available for each country
+ * given those parameters.
+ */
 router.get('/completenessTuples/:indicator/:minYear/:maxYear', (req, res) => {
   if (!req.params.indicator || req.params.indicator === '') { res.sendStatus(400); return; }
   if (!req.params.minYear || req.params.minYear === '') { res.sendStatus(400); return; }
