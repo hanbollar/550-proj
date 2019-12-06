@@ -9,6 +9,10 @@ body {
   background-size: cover;
 }
 
+.jumbotron {
+  border-radius: 0px;
+}
+
 #controlsContainer {
   display: flex;
   flex-direction: row;
