@@ -1,8 +1,27 @@
 /* eslint-disable max-len */
 /* globals document fetch Plotly */
 
+// eslint-disable-next-line no-unused-vars
+function resetInputs() {
+  const indicatorSearchFilter = document.getElementById('indicatorSearchFilter');
+  const indicatorCheckedFilter = document.getElementById('indicatorCheckedFilter');
+  const countrySearchFilter = document.getElementById('countrySearchFilter');
+  const countryCheckedFilter = document.getElementById('countryCheckedFilter');
+  const countryCompletenessFilter = document.getElementById('countryCompletenessFilter');
+  const minYearSlider = document.getElementById('minYearSlider');
+  const maxYearSlider = document.getElementById('maxYearSlider');
+
+  indicatorSearchFilter.value = '';
+  indicatorCheckedFilter.checked = false;
+  countrySearchFilter.value = '';
+  countryCheckedFilter.checked = false;
+  countryCompletenessFilter.value = 0;
+  minYearSlider.value = minYearSlider.min;
+  maxYearSlider.value = maxYearSlider.max;
+}
+
 function removeGraphs() {
-  const graphs = document.getElementById('graphs-container');
+  const graphs = document.getElementById('graphsContainer');
 
   let child = graphs.lastElementChild;
 
@@ -41,7 +60,7 @@ function updateView() {
 
   const countryCompletenesses = Array.from(document.getElementsByClassName('countryCompleteness'));
 
-  const graphsContainer = document.getElementById('graphs-container');
+  const graphsContainer = document.getElementById('graphsContainer');
 
   const minYearSlider = document.getElementById('minYearSlider');
   const maxYearSlider = document.getElementById('maxYearSlider');

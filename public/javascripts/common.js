@@ -2,6 +2,24 @@
 /* eslint-disable no-unused-vars */
 /* global document fetch */
 
+let showControls = true;
+
+// eslint-disable-next-line no-unused-vars
+function toggleShowControls() {
+  showControls = !showControls;
+
+  const controlsContainer = document.getElementById('controlsContainer');
+  const hider = document.getElementById('hider');
+
+  if (showControls) {
+    controlsContainer.removeAttribute('style');
+    hider.innerHTML = '&uarr;';
+  } else {
+    controlsContainer.style.display = 'none';
+    hider.innerHTML = '&darr;';
+  }
+}
+
 function populateNavBar() {
   const nav = document.getElementById('nav');
   nav.className = 'navbar navbar-expand-lg navbar-light bg-light';

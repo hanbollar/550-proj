@@ -17,16 +17,15 @@
     <link href="/stylesheets/graphs.css" rel="stylesheet">
   </head>
 
-  <body onload="populateNavBar();">
+  <body onload="populateNavBar(); resetInputs();">
     <nav id="nav"></nav>
 
     <div ng-controller="countriesController">
       <div ng-controller="indicatorsController">
-        <div id="outer-container">
+        <div id="controlsContainer">
 
           <div id="indicatorControls" class="controls">
             <input id="indicatorSearchFilter" type="text" class="searchFilter form-control" oninput="filterIndicatorBoxes();" placeholder="Filter indicators...">
-
             <input id="indicatorCheckedFilter" class="checkedFilter" type="checkbox" oninput="filterIndicatorBoxes();"> Only show checked
 
             <div id="indicatorBoxes" class="boxes" ng-model="indicatorSelected">
@@ -41,9 +40,7 @@
           
           <div id="countryControls" class="controls">
             <input id="countrySearchFilter" type="text" class="searchFilter form-control" oninput="filterCountryBoxes();" placeholder="Filter countries...">
-
             <input id="countryCheckedFilter" class="checkedFilter" type="checkbox" oninput="filterCountryBoxes();"> Only show checked<br />
-
             <div id="countryCompletenessFilterBox">
               Filter by data completeness<span id="countryCompletenessFilterLabel">(0%)</span>:
               <input id="countryCompletenessFilter" type="range" min="0" max="100" value="0" oninput="filterCountryBoxes();">
@@ -80,7 +77,9 @@
         </div>
       </div>
 
-      <div id="graphs-container">
+      <div id="hider" onclick="toggleShowControls();">&uarr;</div>
+
+      <div id="graphsContainer">
         <!--Graphs will be added here.-->
       </div>
     </div>

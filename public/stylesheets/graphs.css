@@ -1,4 +1,4 @@
-#outer-container {
+#controlsContainer {
   display: flex;
   flex-direction: row;
   flex: 0 0 100%;
@@ -97,7 +97,17 @@ input[type=range][orient=vertical]
   margin: 5px;
 }
 
-#graphs-container {
+#hider {
+  width: 100%;
+  text-align: center;
+  background: white;
+}
+
+#hider:hover {
+  cursor: pointer;
+}
+
+#graphsContainer {
   display: flex;
   flex-direction: column;
   width: 100%;
