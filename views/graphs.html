@@ -20,38 +20,61 @@
   <body onload="populateNavBar();">
     <nav id="nav"></nav>
 
-    <div id="outer-container">
-      <div id="controls-container">
-        <div ng-controller="countriesController">
-          <div ng-controller="indicatorsController">
-            <div ng-controller="yearsController">
+    <div ng-controller="countriesController">
+      <div ng-controller="indicatorsController">
+        <div id="outer-container">
 
-              <input id="indicatorFilter" class="filter" type="textbox" oninput="filterIndicatorCheckboxes();" placeholder="Filter indicators..." />
-              <div id="indicatorCheckboxes" class="checkboxes" ng-model="indicatorSelected">
-                <div ng-repeat="i in indicators">
-                  <div class="indicatorBox" name="{{i.name}}">
-                    <input class="indicatorCheckbox" type="checkbox" name="{{i.name}}" code="{{i.code}}" onchange="constructGraphs();" />{{i.name}}
-                  </div>
+          <div id="indicatorControls" class="controls">
+            <input id="indicatorSearchFilter" type="text" class="searchFilter form-control" oninput="filterIndicatorBoxes();" placeholder="Filter indicators...">
+
+            <input id="indicatorCheckedFilter" class="checkedFilter" type="checkbox" oninput="filterIndicatorBoxes();"> Only show checked
+
+            <div id="indicatorBoxes" class="boxes" ng-model="indicatorSelected">
+              <div ng-repeat="i in indicators">
+                <div class="box indicatorBox" name="{{i.name}}">
+                  <input class="boxElement indicatorCheckbox" type="checkbox" name="{{i.name}}" code="{{i.code}}" onchange="updateView();" />
+                  <span class="boxElement">{{i.name}}</span>
                 </div>
               </div>
+            </div>
+          </div>
+          
+          <div id="countryControls" class="controls">
+            <input id="countrySearchFilter" type="text" class="searchFilter form-control" oninput="filterCountryBoxes();" placeholder="Filter countries...">
 
-              <input id="countryFilter" class="filter" type="textbox" oninput="filterCountryCheckboxes();" placeholder="Filter countries..." />
-              <div id="countryCheckboxes" class="checkboxes" ng-model="countrySelected">
-                <div ng-repeat="c in countries">
-                  <div class="countryBox" name="{{c.name}}">
-                    <input class="countryCheckbox" type="checkbox" name="{{c.name}}" onchange="constructGraphs();" />{{c.name}}
-                  </div>
+            <input id="countryCheckedFilter" class="checkedFilter" type="checkbox" oninput="filterCountryBoxes();"> Only show checked<br />
+
+            <div id="countryCompletenessFilterBox">
+              Filter by data completeness<span id="countryCompletenessFilterLabel">(0%)</span>:
+              <input id="countryCompletenessFilter" type="range" min="0" max="100" value="0" oninput="filterCountryBoxes();">
+            </div>
+
+            <div id="countryBoxes" class="boxes" ng-model="countrySelected">
+              <div ng-repeat="c in countries">
+                <div class="box countryBox" name="{{c.name}}">
+                  <input class="boxElement countryCheckbox" type="checkbox" name="{{c.name}}" onchange="updateView();" />
+                  <span class="boxElement countryCompletenessBox">
+                    <div>[</div>
+                    <div class="countryCompleteness" name="{{c.name}}"></div>
+                    <div>%]</div>
+                  </span>
+                  <span class="boxElement">{{c.name}}</span>
                 </div>
               </div>
+            </div>
+          </div>
+          
+          <div id="minYearControls" class="controls">
+            <div>
+              <input id="minYearSlider" type="range" orient="vertical" min="1960" max="2020" value="1960" oninput="updateView();">
+              <span id="minYearLabel">1960</span>
+            </div>
+          </div>
 
-              <select id="minYearDropdown" class="dropdown" onchange="constructGraphs();" ng-model="minYearSelected" data-ng-options="year as year for year in years">
-                <option value="">Select a start year...</option>
-              </select>
-    
-              <select id="maxYearDropdown" class="dropdown" onchange="constructGraphs();" ng-model="maxYearSelected" data-ng-options="year as year for year in years">
-                <option value="">Select an end year...</option>
-              </select>
-              
+          <div id="maxYearControls" class="controls">
+            <div>
+              <input id="maxYearSlider" type="range" orient="vertical" min="1960" max="2020" value="2020" oninput="updateView();">
+              <span id="maxYearLabel">2020</span>
             </div>
           </div>
         </div>

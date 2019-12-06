@@ -4,7 +4,7 @@
 
 const app = angular.module('angularjsNodejsTutorial', []);
 
-// For unknown reasons, Angular breaks if an arrow callback is used here.
+// Angular breaks if an arrow callback is used here.
 app.controller('indicatorsController', function ($scope, $http) {
   $http({
     url: '/indicatorTuples',
@@ -16,7 +16,7 @@ app.controller('indicatorsController', function ($scope, $http) {
   });
 });
 
-// For unknown reasons, Angular breaks if an arrow callback is used here.
+// Angular breaks if an arrow callback is used here.
 app.controller('countriesController', function ($scope, $http) {
   $http({
     url: '/countryTuples',
@@ -28,19 +28,7 @@ app.controller('countriesController', function ($scope, $http) {
   });
 });
 
-// For unknown reasons, Angular breaks if an arrow callback is used here.
-app.controller('yearsController', function ($scope, $http) {
-  $http({
-    url: '/yearTuples',
-    method: 'GET',
-  }).then((res) => {
-    $scope.years = res.data;
-  }, (err) => {
-    console.log('[!] ', err);
-  });
-});
-
-// For unknown reasons, Angular breaks if an arrow callback is used here.
+// Angular breaks if an arrow callback is used here.
 app.controller('cardsController', function ($scope, $http) {
   $scope.changedInput = function (indicator, minYear, maxYear) {
     if (!indicator) return;
@@ -59,7 +47,7 @@ app.controller('cardsController', function ($scope, $http) {
   };
 });
 
-// For unknown reasons, Angular breaks if an arrow callback is used here.
+// Angular breaks if an arrow callback is used here.
 app.controller('yoyController', function ($scope, $http) {
   $scope.changedInput = function (indicator) {
     if (!indicator) return;
@@ -76,6 +64,7 @@ app.controller('yoyController', function ($scope, $http) {
   };
 });
 
+// Angular breaks if an arrow callback is used here.
 app.controller('yoyPairController', function ($scope, $http) {
   $scope.changedInput = function (indicatorNumerator, indicatorDenominator) {
     if (!indicatorNumerator) return;

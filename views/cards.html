@@ -18,36 +18,22 @@
     <nav id="nav"></nav>
 
     <div ng-controller="indicatorsController">
-      <div ng-controller="yearsController">
-        <div ng-controller="cardsController" ng-model="cards">
-          <select class="dropdown" ng-model="indicatorSelected" ng-change="changedInput(indicatorSelected, minYearSelected, maxYearSelected)" data-ng-options="indicator as indicator.name for indicator in indicators">
-            <option value="">Select an indicator...</option>
-          </select>
+      <div ng-controller="cardsController" ng-model="cards">
+        <select class="dropdown" ng-model="indicatorSelected" ng-change="changedInput(indicatorSelected, minYearSelected, maxYearSelected)" data-ng-options="indicator as indicator.name for indicator in indicators">
+          <option value="">Select an indicator...</option>
+        </select>
 
-          <br />
+        <br />
 
-          <select class="dropdown" ng-model="minYearSelected" ng-change="changedInput(indicatorSelected, minYearSelected, maxYearSelected)" data-ng-options="year as year for year in years">
-            <option value="">Select a start year...</option>
-          </select>
-
-          <br />
-
-          <select class="dropdown" ng-model="maxYearSelected" ng-change="changedInput(indicatorSelected, minYearSelected, maxYearSelected)" data-ng-options="year as year for year in years">
-            <option value="">Select an end year...</option>
-          </select>
-
-          <br />
-
-          <div class="outer-container">
-            <div class="inner-container">
-              <div class="outer-box" ng-repeat="c in cards">
-                <div class="inner-box" >
-                  <img src= "{{'../assets/flag_images/' + ((c.name.split(' ').join('')) | lowercase) + '.png'}}" onerror=this.src='../assets/flag_images/blank.png' alt='not found'></img>
-                   <br /><br /><p></p><p></p><p></p>
-                   <p><i><b ng-class="({{c.percentage_change | number: 2}} >= 0.01) ? 'green-class' : {{c.percentage_change | number: 2}} <= -0.01 ? 'red-class' : 'white-class'">{{(c.percentage_change | number: 2) + '%'}}</b></i> <br/> 
-                    {{c.name}}
-                    </p>
-                </div>
+        <div class="outer-container">
+          <div class="inner-container">
+            <div class="outer-box" ng-repeat="c in cards">
+              <div class="inner-box" >
+              <img src="{{'../assets/flag_images/' + ((c.name.split(' ').join('')) | lowercase) + '.png'}}" onerror="this.onerror=null; this.src='../assets/flag_images/blank.png';"></img>
+                <br /><br /><p></p><p></p><p></p>
+                <p><i><b ng-class="({{c.percentage_change | number: 2}} >= 0.01) ? 'green-class' : {{c.percentage_change | number: 2}} <= -0.01 ? 'red-class' : 'white-class'">{{(c.percentage_change | number: 2) + '%'}}</b></i> <br/> 
+                {{c.name}}
+                </p>
               </div>
             </div>
           </div>

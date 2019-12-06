@@ -57,16 +57,6 @@ router.get('/indicatorTuples', (req, res) => {
   });
 });
 
-router.get('/yearTuples', (req, res) => {
-  const rows = [];
-
-  for (let i = 1900; i <= 2020; i += 1) {
-    rows.push(i);
-  }
-
-  res.send(rows);
-});
-
 router.get('/cardTuples/:indicator/:minYear/:maxYear', (req, res) => {
   if (!req.params.indicator || req.params.indicator === '') { res.sendStatus(400); return; }
   if (!req.params.minYear || req.params.minYear === '') { res.sendStatus(400); return; }
@@ -113,6 +103,8 @@ router.get('/cardTuples/:indicator/:minYear/:maxYear', (req, res) => {
     JOIN     Country c
     ON       c.cid = cpc.cid
     ORDER BY cpc.percentage_change DESC;`;
+
+  console.log(query);
 
   connection.query(query, (err, rows) => {
     if (err) console.log(`[!] /cardTuples route: ${err}`);
@@ -203,6 +195,8 @@ router.get('/yoyTuples/:indicator', (req, res) => {
               yoyc.end_year
     ORDER BY  yoyc.percentage_change DESC;`;
 
+  console.log(query);
+
   connection.query(query, (err, rows) => {
     if (err) console.log(`[!] /yoyTuples route: ${err}`);
     else {
@@ -243,6 +237,8 @@ router.get('/yoyPairTuples/:indicatorNumerator/:indicatorDenominator', (req, res
               yoyc.end_year
     ORDER BY  yoyc.percentage_change DESC;`;
 
+  console.log(query);
+
   connection.query(query, (err, rows) => {
     if (err) console.log(`[!] /yoyPairTuples route: ${err}`);
     else {
@@ -251,41 +247,29 @@ router.get('/yoyPairTuples/:indicatorNumerator/:indicatorDenominator', (req, res
   });
 });
 
-router.get('/completenessTuples/:indicator/:minYear/:maxYear/:country', (req, res) => {
+router.get('/completenessTuples/:indicator/:minYear/:maxYear', (req, res) => {
   if (!req.params.indicator || req.params.indicator === '') { res.sendStatus(400); return; }
   if (!req.params.minYear || req.params.minYear === '') { res.sendStatus(400); return; }
   if (!req.params.maxYear || req.params.maxYear === '') { res.sendStatus(400); return; }
   if (req.params.minYear > req.params.maxYear) { res.sendStatus(400); return; }
-  if (!req.params.country || req.params.country === '') { res.sendStatus(400); return; }
 
-  const countryNames = [];
-  countryNames.push(req.params.country);
-
-  let query = `
+  const query = `
     WITH values_per_country AS (
       SELECT    i.cid,
                 c.name,
                 count(*) AS num_values
-      FROM      ${req.body.indicator} i
+      FROM      ${req.params.indicator} i
       JOIN      Country c
       ON        c.cid = i.cid
       WHERE     i.year >= ${req.params.minYear}
       AND       i.year <= ${req.params.maxYear}
-      AND      (c.name = '${countryNames[0]}'`;
-
-  // For every country beyond the first, add a line to the query.
-  for (let i = 1; i < countryNames.length; i += 1) {
-    query += `
-      OR        c.name = '${countryNames[i]}'`;
-  }
-
-  query += `)
       GROUP BY  i.cid,
                 c.name)
     SELECT    vpc.name,
               (vpc.num_values / (${req.params.maxYear} - ${req.params.minYear} + 1)) AS completeness
-    FROM      values_per_country vpc
-    ORDER BY  completeness DESC;`;
+    FROM      values_per_country vpc`;
+
+  console.log(query);
 
   connection.query(query, (err, rows) => {
     if (err) console.log(`[!] /completenessTuples route: ${err}`);

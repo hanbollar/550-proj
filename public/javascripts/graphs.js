@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 /* globals document fetch Plotly */
 
 function removeGraphs() {
@@ -37,79 +38,193 @@ function constructGraph(dataMap, indicatorName) {
 }
 
 // eslint-disable-next-line no-unused-vars
-function constructGraphs() {
-  const indicatorCheckboxes = Array.from(document.getElementsByClassName('indicatorCheckbox'))
-    .filter((countryDropdown) => countryDropdown.checked === true);
-
-  const countryCheckboxes = Array.from(document.getElementsByClassName('countryCheckbox'))
-    .filter((countryDropdown) => countryDropdown.checked === true);
-
-  const minYearDropdown = document.getElementById('minYearDropdown');
-  const maxYearDropdown = document.getElementById('maxYearDropdown');
-
-  if (indicatorCheckboxes.length === 0) { return; }
-  if (countryCheckboxes.length === 0) { return; }
-  if (minYearDropdown.selectedIndex === 0) { return; }
-  if (maxYearDropdown.selectedIndex === 0) { return; }
-
-  const minYear = minYearDropdown.options[minYearDropdown.selectedIndex].label;
-  const maxYear = maxYearDropdown.options[maxYearDropdown.selectedIndex].label;
-
+function updateView() {
   removeGraphs();
 
-  indicatorCheckboxes.forEach((indicatorCheckbox) => {
+  const indicatorCheckboxedChecked = Array.from(document.getElementsByClassName('indicatorCheckbox'))
+    .filter((countryDropdown) => countryDropdown.checked === true);
+
+  const countryCheckboxesChecked = Array.from(document.getElementsByClassName('countryCheckbox'))
+    .filter((countryDropdown) => countryDropdown.checked === true);
+
+  const countryCompletenesses = Array.from(document.getElementsByClassName('countryCompleteness'));
+
+  const minYearSlider = document.getElementById('minYearSlider');
+  const maxYearSlider = document.getElementById('maxYearSlider');
+
+  let minYear = minYearSlider.value;
+  let maxYear = maxYearSlider.value;
+
+  const minYearLabel = document.getElementById('minYearLabel');
+  const maxYearLabel = document.getElementById('maxYearLabel');
+
+  minYearLabel.innerHTML = minYear;
+  maxYearLabel.innerHTML = maxYear;
+
+  if (minYear > maxYear) {
+    const temp = minYear;
+    minYear = maxYear;
+    maxYear = temp;
+  }
+
+  // If no indicators are selected, clear the completeness percentages and return.
+  if (indicatorCheckboxedChecked.length === 0) {
+    countryCompletenesses.forEach((countryCompleteness) => {
+      const newCountryCompleteness = countryCompleteness;
+      newCountryCompleteness.innerHTML = '';
+    });
+
+    return;
+  }
+
+  // At least one indicator is selected.
+  // Compute and display average completeness percentages.
+  const completenessMap = new Map();
+  indicatorCheckboxedChecked.forEach((indicatorCheckbox) => {
     const indicatorCode = indicatorCheckbox.getAttribute('code');
-    const indicatorName = indicatorCheckbox.getAttribute('name');
 
-    let url = `/graphTuples/${indicatorCode}/${minYear}/${maxYear}`;
-
-    countryCheckboxes.forEach((countryDropdown) => { url += `/${countryDropdown.getAttribute('name')}`; });
+    const url = `/completenessTuples/${indicatorCode}/${minYear}/${maxYear}`;
 
     fetch(url)
       .then((res) => res.json())
       .then((json) => {
-        const dataMap = new Map();
-
         json.forEach((tuple) => {
-          if (!dataMap.has(tuple.cid)) {
-            dataMap.set(tuple.cid, { name: tuple.name, years: [], values: [] });
+          const countryName = tuple.name;
+          const completenessForIndicator = Number(tuple.completeness);
+
+          if (!completenessMap.has(countryName)) {
+            completenessMap.set(countryName, { count: 0, total: 0, average: 0 });
           }
 
-          const countryData = dataMap.get(tuple.cid);
+          const mapValue = completenessMap.get(countryName);
+
+          const newCount = mapValue.count + 1;
+          const newTotal = mapValue.total + completenessForIndicator;
+          const newAverage = newTotal / newCount;
+
+          completenessMap.set(countryName, {
+            count: newCount,
+            total: newTotal,
+            average: newAverage,
+          });
+        });
+      })
+      .then(() => {
+        countryCompletenesses.forEach((countryCompleteness) => {
+          const countryName = countryCompleteness.getAttribute('name');
+          const newCountryCompleteness = countryCompleteness;
+
+          if (completenessMap.has(countryName)) {
+            newCountryCompleteness.innerHTML = `${Math.round(completenessMap.get(countryName).average * 100)}`;
+          } else {
+            newCountryCompleteness.innerHTML = '';
+          }
+        });
+      });
+  });
+
+  if (countryCheckboxesChecked.length === 0) { return; }
+
+  indicatorCheckboxedChecked.forEach((indicatorCheckbox) => {
+    const indicatorCode = indicatorCheckbox.getAttribute('code');
+    const indicatorName = indicatorCheckbox.getAttribute('name');
+
+    let url = `/graphTuples/${indicatorCode}/${minYear}/${maxYear}`;
+    countryCheckboxesChecked.forEach((countryDropdown) => { url += `/${countryDropdown.getAttribute('name')}`; });
+
+    fetch(url)
+      .then((res) => res.json())
+      .then((json) => {
+        const graphMap = new Map();
+
+        json.forEach((tuple) => {
+          if (!graphMap.has(tuple.cid)) {
+            graphMap.set(tuple.cid, { name: tuple.name, years: [], values: [] });
+          }
+
+          const countryData = graphMap.get(tuple.cid);
           countryData.years.push(tuple.year);
           countryData.values.push(tuple.value);
         });
 
-        constructGraph(dataMap, indicatorName);
+        constructGraph(graphMap, indicatorName);
       });
   });
 }
 
-function filterCheckboxes(checkboxName, filterName) {
-  const checkboxes = Array.from(document.getElementsByClassName(checkboxName));
-  const filter = document.getElementById(filterName);
+function filterBoxes(
+  boxClass,
+  checkOrRadioClass,
+  completenessClass,
+  searchFilterId,
+  checkedFilterId,
+  completenessFilterId,
+  completenessFilterLabelId,
+) {
+  const boxes = Array.from(document.getElementsByClassName(boxClass));
+  const searchFilter = document.getElementById(searchFilterId);
+  const checkedFilter = document.getElementById(checkedFilterId);
+  let completenessFilter;
+  let completenessFilterValue;
+  let completenessFilterLabel;
 
-  if (filter.value === '') {
-    return;
+  if (completenessFilterId) {
+    completenessFilter = document.getElementById(completenessFilterId);
+    completenessFilterValue = completenessFilter.value;
+    completenessFilterLabel = document.getElementById(completenessFilterLabelId);
+    completenessFilterLabel.innerHTML = `(${completenessFilterValue}%)`;
   }
 
-  checkboxes.forEach((checkbox) => {
-    const domCheckbox = checkbox;
+  const usingSearchFilter = searchFilter.value !== '';
+  const usingCheckedFilter = checkedFilter.checked;
+  const usingCompletenessFilter = (completenessClass && completenessFilterId && completenessFilterValue > 0);
 
-    if (checkbox.getAttribute('name').includes(filter.value)) {
-      domCheckbox.style.display = 'block';
+  boxes.forEach((box) => {
+    const boxNew = box;
+    const checkOrRadio = boxNew.getElementsByClassName(checkOrRadioClass)[0];
+
+    const inViaSearchFilter = boxNew.getAttribute('name').toLowerCase().includes(searchFilter.value.toLowerCase());
+    const inViaCheckedFilter = checkOrRadio.checked;
+    let inViaCompletenessFilter;
+
+    if (usingCompletenessFilter) {
+      inViaCompletenessFilter = Number(boxNew.getElementsByClassName(completenessClass)[0].innerHTML) >= completenessFilterValue;
+    }
+
+    let shouldDisplay = false;
+
+    if (usingSearchFilter && usingCheckedFilter && usingCompletenessFilter) {
+      shouldDisplay = inViaSearchFilter && inViaCompletenessFilter;
+    } else if (usingSearchFilter && usingCheckedFilter) {
+      shouldDisplay = inViaSearchFilter && inViaCheckedFilter;
+    } else if (usingCheckedFilter && usingCompletenessFilter) {
+      shouldDisplay = inViaCheckedFilter && inViaCompletenessFilter;
+    } else if (usingSearchFilter && usingCompletenessFilter) {
+      shouldDisplay = inViaSearchFilter && inViaCompletenessFilter;
+    } else if (usingSearchFilter) {
+      shouldDisplay = inViaSearchFilter;
+    } else if (usingCheckedFilter) {
+      shouldDisplay = inViaCheckedFilter;
+    } else if (usingCompletenessFilter) {
+      shouldDisplay = inViaCompletenessFilter;
     } else {
-      domCheckbox.style.display = 'none';
+      shouldDisplay = true;
+    }
+
+    if (shouldDisplay) {
+      boxNew.removeAttribute('style');
+    } else {
+      boxNew.style.display = 'none';
     }
   });
 }
 
 // eslint-disable-next-line no-unused-vars
-function filterIndicatorCheckboxes() {
-  filterCheckboxes('indicatorBox', 'indicatorFilter');
+function filterIndicatorBoxes() {
+  filterBoxes('indicatorBox', 'indicatorCheckbox', null, 'indicatorSearchFilter', 'indicatorCheckedFilter', null, null);
 }
 
 // eslint-disable-next-line no-unused-vars
-function filterCountryCheckboxes() {
-  filterCheckboxes('countryBox', 'countryFilter');
+function filterCountryBoxes() {
+  filterBoxes('countryBox', 'countryCheckbox', 'countryCompleteness', 'countrySearchFilter', 'countryCheckedFilter', 'countryCompletenessFilter', 'countryCompletenessFilterLabel');
 }
