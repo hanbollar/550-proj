@@ -107,8 +107,6 @@ router.get('/increaseTuples/:indicator/:minYear/:maxYear', (req, res) => {
     ON       c.cid = cpc.cid
     ORDER BY cpc.percentage_change DESC;`;
 
-  console.log(query);
-
   connection.query(query, (err, rows) => {
     if (err) console.log(`[!] /increaseTuples route: ${err}`);
     else {
@@ -156,8 +154,6 @@ router.get('/yoyTuples/:indicator/:minYear/:maxYear', (req, res) => {
               yoyc.start_year,
               yoyc.end_year
     ORDER BY  yoyc.percentage_change DESC;`;
-
-  console.log(query);
 
   connection.query(query, (err, rows) => {
     if (err) console.log(`[!] /yoyTuples route: ${err}`);
@@ -213,8 +209,6 @@ router.get('/yoyPairTuples/:indicatorNumerator/:indicatorDenominator/:minYear/:m
               yoyc.start_year,
               yoyc.end_year
     ORDER BY  yoyc.percentage_change DESC;`;
-
-  console.log(query);
 
   connection.query(query, (err, rows) => {
     if (err) console.log(`[!] /yoyPairTuples route: ${err}`);
@@ -275,8 +269,6 @@ router.get('/graphTuples/*', (req, res) => {
     AND       i.year <= ${maxYear}
     ORDER BY  c.name, i.year;`;
 
-  console.log(query);
-
   connection.query(query, (err, rows) => {
     if (err) console.log(`[!] /graphTuples route: ${err}`);
     else {
@@ -312,9 +304,7 @@ router.get('/completenessTuples/:indicator/:minYear/:maxYear', (req, res) => {
                 c.name)
     SELECT    vpc.name,
               (vpc.num_values / (${req.params.maxYear} - ${req.params.minYear} + 1)) AS completeness
-    FROM      values_per_country vpc`;
-
-  console.log(query);
+    FROM      values_per_country vpc;`;
 
   connection.query(query, (err, rows) => {
     if (err) console.log(`[!] /completenessTuples route: ${err}`);
