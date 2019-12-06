@@ -13,12 +13,6 @@ function removeGraphs() {
 }
 
 function constructGraph(dataMap, indicatorName) {
-  const graphs = document.getElementById('graphs-container');
-
-  const graph = document.createElement('div');
-  graph.setAttribute('class', 'graph');
-  graphs.appendChild(graph);
-
   const dataSeries = [];
 
   dataMap.forEach((countryData) => {
@@ -34,13 +28,11 @@ function constructGraph(dataMap, indicatorName) {
     title: indicatorName,
   };
 
-  Plotly.plot(graph, dataSeries, layout, { showSendToCloud: true });
+  return { dataSeries, layout };
 }
 
 // eslint-disable-next-line no-unused-vars
 function updateView() {
-  removeGraphs();
-
   const indicatorCheckboxedChecked = Array.from(document.getElementsByClassName('indicatorCheckbox'))
     .filter((countryDropdown) => countryDropdown.checked === true);
 
@@ -48,6 +40,8 @@ function updateView() {
     .filter((countryDropdown) => countryDropdown.checked === true);
 
   const countryCompletenesses = Array.from(document.getElementsByClassName('countryCompleteness'));
+
+  const graphsContainer = document.getElementById('graphs-container');
 
   const minYearSlider = document.getElementById('minYearSlider');
   const maxYearSlider = document.getElementById('maxYearSlider');
@@ -131,6 +125,7 @@ function updateView() {
 
     let url = `/graphTuples/${indicatorCode}/${minYear}/${maxYear}`;
     countryCheckboxesChecked.forEach((countryDropdown) => { url += `/${countryDropdown.getAttribute('name')}`; });
+    const graphData = [];
 
     fetch(url)
       .then((res) => res.json())
@@ -147,84 +142,20 @@ function updateView() {
           countryData.values.push(tuple.value);
         });
 
-        constructGraph(graphMap, indicatorName);
+        graphData.push(constructGraph(graphMap, indicatorName));
+      })
+      .then(() => {
+        if (graphData.length >= indicatorCheckboxedChecked.length) {
+          removeGraphs();
+
+          graphData.forEach((graphDatum) => {
+            const graph = document.createElement('div');
+            graph.setAttribute('class', 'graph');
+            graphsContainer.appendChild(graph);
+
+            Plotly.plot(graph, graphDatum.dataSeries, graphDatum.layout);
+          });
+        }
       });
   });
-}
-
-function filterBoxes(
-  boxClass,
-  checkOrRadioClass,
-  completenessClass,
-  searchFilterId,
-  checkedFilterId,
-  completenessFilterId,
-  completenessFilterLabelId,
-) {
-  const boxes = Array.from(document.getElementsByClassName(boxClass));
-  const searchFilter = document.getElementById(searchFilterId);
-  const checkedFilter = document.getElementById(checkedFilterId);
-  let completenessFilter;
-  let completenessFilterValue;
-  let completenessFilterLabel;
-
-  if (completenessFilterId) {
-    completenessFilter = document.getElementById(completenessFilterId);
-    completenessFilterValue = completenessFilter.value;
-    completenessFilterLabel = document.getElementById(completenessFilterLabelId);
-    completenessFilterLabel.innerHTML = `(${completenessFilterValue}%)`;
-  }
-
-  const usingSearchFilter = searchFilter.value !== '';
-  const usingCheckedFilter = checkedFilter.checked;
-  const usingCompletenessFilter = (completenessClass && completenessFilterId && completenessFilterValue > 0);
-
-  boxes.forEach((box) => {
-    const boxNew = box;
-    const checkOrRadio = boxNew.getElementsByClassName(checkOrRadioClass)[0];
-
-    const inViaSearchFilter = boxNew.getAttribute('name').toLowerCase().includes(searchFilter.value.toLowerCase());
-    const inViaCheckedFilter = checkOrRadio.checked;
-    let inViaCompletenessFilter;
-
-    if (usingCompletenessFilter) {
-      inViaCompletenessFilter = Number(boxNew.getElementsByClassName(completenessClass)[0].innerHTML) >= completenessFilterValue;
-    }
-
-    let shouldDisplay = false;
-
-    if (usingSearchFilter && usingCheckedFilter && usingCompletenessFilter) {
-      shouldDisplay = inViaSearchFilter && inViaCompletenessFilter;
-    } else if (usingSearchFilter && usingCheckedFilter) {
-      shouldDisplay = inViaSearchFilter && inViaCheckedFilter;
-    } else if (usingCheckedFilter && usingCompletenessFilter) {
-      shouldDisplay = inViaCheckedFilter && inViaCompletenessFilter;
-    } else if (usingSearchFilter && usingCompletenessFilter) {
-      shouldDisplay = inViaSearchFilter && inViaCompletenessFilter;
-    } else if (usingSearchFilter) {
-      shouldDisplay = inViaSearchFilter;
-    } else if (usingCheckedFilter) {
-      shouldDisplay = inViaCheckedFilter;
-    } else if (usingCompletenessFilter) {
-      shouldDisplay = inViaCompletenessFilter;
-    } else {
-      shouldDisplay = true;
-    }
-
-    if (shouldDisplay) {
-      boxNew.removeAttribute('style');
-    } else {
-      boxNew.style.display = 'none';
-    }
-  });
-}
-
-// eslint-disable-next-line no-unused-vars
-function filterIndicatorBoxes() {
-  filterBoxes('indicatorBox', 'indicatorCheckbox', null, 'indicatorSearchFilter', 'indicatorCheckedFilter', null, null);
-}
-
-// eslint-disable-next-line no-unused-vars
-function filterCountryBoxes() {
-  filterBoxes('countryBox', 'countryCheckbox', 'countryCompleteness', 'countrySearchFilter', 'countryCheckedFilter', 'countryCompletenessFilter', 'countryCompletenessFilterLabel');
 }

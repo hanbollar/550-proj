@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 /* eslint-disable no-unused-vars */
 /* global document fetch */
 
@@ -42,4 +43,80 @@ function populateNavBar() {
   facts.href = '/facts';
   facts.innerHTML = 'Country Facts';
   innerContainer.appendChild(facts);
+}
+function filterBoxes(
+  boxClass,
+  checkOrRadioClass,
+  completenessClass,
+  searchFilterId,
+  checkedFilterId,
+  completenessFilterId,
+  completenessFilterLabelId,
+) {
+  const boxes = Array.from(document.getElementsByClassName(boxClass));
+  const searchFilter = document.getElementById(searchFilterId);
+  const checkedFilter = document.getElementById(checkedFilterId);
+  let completenessFilter;
+  let completenessFilterValue;
+  let completenessFilterLabel;
+
+  if (completenessFilterId) {
+    completenessFilter = document.getElementById(completenessFilterId);
+    completenessFilterValue = completenessFilter.value;
+    completenessFilterLabel = document.getElementById(completenessFilterLabelId);
+    completenessFilterLabel.innerHTML = `(${completenessFilterValue}%)`;
+  }
+
+  const usingSearchFilter = searchFilter.value !== '';
+  const usingCheckedFilter = checkedFilter.checked;
+  const usingCompletenessFilter = (completenessClass && completenessFilterId && completenessFilterValue > 0);
+
+  boxes.forEach((box) => {
+    const boxNew = box;
+    const checkOrRadio = boxNew.getElementsByClassName(checkOrRadioClass)[0];
+
+    const inViaSearchFilter = boxNew.getAttribute('name').toLowerCase().includes(searchFilter.value.toLowerCase());
+    const inViaCheckedFilter = checkOrRadio.checked;
+    let inViaCompletenessFilter;
+
+    if (usingCompletenessFilter) {
+      inViaCompletenessFilter = Number(boxNew.getElementsByClassName(completenessClass)[0].innerHTML) >= completenessFilterValue;
+    }
+
+    let shouldDisplay = false;
+
+    if (usingSearchFilter && usingCheckedFilter && usingCompletenessFilter) {
+      shouldDisplay = inViaSearchFilter && inViaCompletenessFilter;
+    } else if (usingSearchFilter && usingCheckedFilter) {
+      shouldDisplay = inViaSearchFilter && inViaCheckedFilter;
+    } else if (usingCheckedFilter && usingCompletenessFilter) {
+      shouldDisplay = inViaCheckedFilter && inViaCompletenessFilter;
+    } else if (usingSearchFilter && usingCompletenessFilter) {
+      shouldDisplay = inViaSearchFilter && inViaCompletenessFilter;
+    } else if (usingSearchFilter) {
+      shouldDisplay = inViaSearchFilter;
+    } else if (usingCheckedFilter) {
+      shouldDisplay = inViaCheckedFilter;
+    } else if (usingCompletenessFilter) {
+      shouldDisplay = inViaCompletenessFilter;
+    } else {
+      shouldDisplay = true;
+    }
+
+    if (shouldDisplay) {
+      boxNew.removeAttribute('style');
+    } else {
+      boxNew.style.display = 'none';
+    }
+  });
+}
+
+// eslint-disable-next-line no-unused-vars
+function filterIndicatorBoxes() {
+  filterBoxes('indicatorBox', 'indicatorCheckbox', null, 'indicatorSearchFilter', 'indicatorCheckedFilter', null, null);
+}
+
+// eslint-disable-next-line no-unused-vars
+function filterCountryBoxes() {
+  filterBoxes('countryBox', 'countryCheckbox', 'countryCompleteness', 'countrySearchFilter', 'countryCheckedFilter', 'countryCompletenessFilter', 'countryCompletenessFilterLabel');
 }
