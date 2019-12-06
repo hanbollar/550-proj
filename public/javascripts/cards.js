@@ -64,6 +64,30 @@ function removeCards() {
   }
 }
 
+function showNoCardsMessage(show) {
+  const noCardsMessage = document.getElementById('noCardsMessage');
+
+  if (show) {
+    noCardsMessage.removeAttribute('style');
+  } else {
+    noCardsMessage.style.display = 'none';
+  }
+}
+
+function displayPercentage(number) {
+  const percentage = (number * 100).toFixed(2);
+
+  if (percentage > 0) {
+    return `<h4 style="color:rgb(0,255,10);">${percentage}% increase</h4>`;
+  }
+
+  if (percentage < 0) {
+    return `<h4 style="color:rgb(255,30,0);">${-percentage}% decrease</h4>`;
+  }
+
+  return '<h4>0% increase</h4>';
+}
+
 function createIncreaseCards(minYear, maxYear) {
   const cardsContainer = document.getElementById('cardsContainer');
 
@@ -98,6 +122,12 @@ function createIncreaseCards(minYear, maxYear) {
     .then((json) => {
       removeCards();
 
+      if (json.length > 0) {
+        showNoCardsMessage(false);
+      } else {
+        showNoCardsMessage(true);
+      }
+
       // For each tuple in the primary indicator data, create a card.
       json.forEach((tuple) => {
         const outerCard = document.createElement('div');
@@ -120,11 +150,19 @@ function createIncreaseCards(minYear, maxYear) {
         innerCard.appendChild(cardText);
 
         if (tertiaryIndicatorCheckboxesChecked.length === 0) {
-          cardText.innerHTML = `<h3>${tuple.name}</h3><br />${primaryIndicatorName}<br />${(tuple.percentage_change * 100).toFixed(2)}% increase`;
+          cardText.innerHTML = `
+          <h3>${tuple.name}</h3><br />
+          ${primaryIndicatorName}<br />
+          ${displayPercentage(tuple.percentage_change)}<br />
+          <small style="text-align:right;">${minYear}-${maxYear}</small><br />`;
+        // We need to add tertiary data. Hide the card until that step is complete.
+        } else {
+          innerCard.style.display = 'none';
         }
 
         // Map the card so it can be retrieved when tertiary data is added.
         cardsMap.set(tuple.name, {
+          innerCard,
           cardText,
           countryName: tuple.name,
           primaryChange: tuple.percentage_change,
@@ -148,11 +186,10 @@ function createIncreaseCards(minYear, maxYear) {
             json.forEach((tuple) => {
               newTertiaryIndicatorTable.tuples.push({ countryName: tuple.name, tertiaryChange: tuple.percentage_change });
             });
-          })
-          .then(() => {
+
             tertiaryIndicatorTables.push(newTertiaryIndicatorTable);
 
-            // If all of the tertiary data tables are ready, display everything.
+            // If this was the last tertiary data table to be processed, proceed to displaying everything.
             if (tertiaryIndicatorTables.length >= tertiaryIndicatorCheckboxesChecked.length) {
               // Add the tertiary data to each card's entry in the map.
               tertiaryIndicatorTables.forEach((tertiaryIndicatorTable) => {
@@ -161,7 +198,7 @@ function createIncreaseCards(minYear, maxYear) {
                   if (cardsMap.has(tertiaryIndicatorTuple.countryName)) {
                     // Store the tertiary indicator's name and value (i.e., the percentage change).
                     cardsMap.get(tertiaryIndicatorTuple.countryName).tertiaryChanges.push({
-                      indicatorName: newTertiaryIndicatorTable.indicatorName,
+                      indicatorName: tertiaryIndicatorTable.indicatorName,
                       value: tertiaryIndicatorTuple.tertiaryChange,
                     });
                   }
@@ -171,12 +208,19 @@ function createIncreaseCards(minYear, maxYear) {
               // Display all of the data.
               cardsMap.forEach((card) => {
                 const cardNew = card;
+                cardNew.innerCard.removeAttribute('style');
 
-                let text = `<h3>${card.countryName}</h3><br />${primaryIndicatorName}<br />${(card.primaryChange * 100).toFixed(2)}% increase`;
+                let text = `
+                <h3>${card.countryName}</h3><br />
+                <small>${minYear}-${maxYear}</small><br />
+                <em style="color:lightblue">${primaryIndicatorName}</em><br />
+                ${displayPercentage(card.primaryChange)}`;
 
                 cardNew.tertiaryChanges.forEach((tertiaryChange) => {
-                  text += `<br />${tertiaryChange.indicatorName}<br />${(tertiaryChange.value * 100).toFixed(2)}% increase`;
+                  text += `<br /><em style="color:lightblue">${tertiaryChange.indicatorName}</em><br />${displayPercentage(tertiaryChange.value)}`;
                 });
+
+                text += `<small style="text-align:right;">${minYear}-${maxYear}</small><br />`;
 
                 cardNew.cardText.innerHTML = text;
               });
@@ -214,6 +258,12 @@ function createYoyCards(minYear, maxYear) {
     .then((json) => {
       removeCards();
 
+      if (json.length > 0) {
+        showNoCardsMessage(false);
+      } else {
+        showNoCardsMessage(true);
+      }
+
       // For each tuple in the data, create a card.
       json.forEach((tuple) => {
         const outerCard = document.createElement('div');
@@ -235,8 +285,9 @@ function createYoyCards(minYear, maxYear) {
         cardText.className = 'cardText';
         cardText.innerHTML = `
           <h3>${tuple.name}</h3><br />
-          ${primaryIndicatorName}<br />
-          ${(tuple.percentage_change * 100).toFixed(2)}% increase between ${tuple.start_year} and ${tuple.end_year}`;
+          <em style="color:lightblue">${primaryIndicatorName}</em><br />
+          ${displayPercentage(tuple.percentage_change)}
+          between ${tuple.start_year} and ${tuple.end_year}`;
         innerCard.appendChild(cardText);
       });
     });
@@ -289,6 +340,12 @@ function createYoyPairsCards(minYear, maxYear) {
     .then((json) => {
       removeCards();
 
+      if (json.length > 0) {
+        showNoCardsMessage(false);
+      } else {
+        showNoCardsMessage(true);
+      }
+
       // For each tuple in the data, create a card.
       json.forEach((tuple) => {
         const outerCard = document.createElement('div');
@@ -310,14 +367,31 @@ function createYoyPairsCards(minYear, maxYear) {
         cardText.className = 'cardText';
         cardText.innerHTML = `
           <h3>${tuple.name}</h3><br />
-          The ratio of<br />
-          ${primaryIndicatorName}<br />
-          relative to<br />
-          ${secondaryIndicatorName}<br />
-          experienced a ${(tuple.percentage_change * 100).toFixed(2)}% increase between ${tuple.start_year} and ${tuple.end_year}`;
+          <strong>The ratio of</strong><br />
+          <em style="color:lightblue">${primaryIndicatorName}</em><br />
+          <strong>relative to</strong><br />
+          <em style="color:lightblue">${secondaryIndicatorName}</em><br />
+          <strong>experienced a</strong>
+          ${displayPercentage(tuple.percentage_change)}
+          <strong>between ${tuple.start_year} and ${tuple.end_year}</strong>`;
         innerCard.appendChild(cardText);
       });
     });
+}
+
+// eslint-disable-next-line no-unused-vars
+function updateSliderLabels() {
+  const minYearSlider = document.getElementById('minYearSlider');
+  const maxYearSlider = document.getElementById('maxYearSlider');
+
+  const minYear = minYearSlider.value;
+  const maxYear = maxYearSlider.value;
+
+  const minYearLabel = document.getElementById('minYearLabel');
+  const maxYearLabel = document.getElementById('maxYearLabel');
+
+  minYearLabel.innerHTML = minYear;
+  maxYearLabel.innerHTML = maxYear;
 }
 
 // eslint-disable-next-line no-unused-vars

@@ -9,7 +9,7 @@ config.connectionLimit = 10;
 const connection = mysql.createPool(config);
 
 router.get('/', (req, res) => {
-  res.redirect('/cards');
+  res.redirect('/about');
 });
 
 router.get('/about', (req, res) => {
