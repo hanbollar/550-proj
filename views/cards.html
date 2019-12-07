@@ -15,7 +15,7 @@
     <link href="stylesheets/cards.css" rel="stylesheet">
   </head>
 
-  <body onload="populateNavBar(); resetControls(); showNoCardsMessage(false);">
+  <body onload="populateNavBar(); resetControls(); showMessage(false, '');">
     <nav id="nav"></nav>
 
     <div ng-controller="countriesController">
@@ -96,11 +96,11 @@
 
       <div id="hider" onclick="toggleShowControls();">&uarr;</div>
 
-      <div id="noCardsContainer">
-        <div id="noCardsMessage">
+      <div id="messageContainer">
+        <div id="messageCard">
           <div class="outerCard">
             <div class="innerCard">
-              <div class="cardText">
+              <div id="message" class="cardText">
                 No cards to display
               </div>
             </div>

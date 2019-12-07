@@ -137,16 +137,18 @@ function resetControls() {
 }
 
 /**
- * Displays a message indicating that there are no cards to display,
- * given the parameters provided.
+ * Displays a message indicating the status of the query.
  */
-function showNoCardsMessage(show) {
-  const noCardsMessage = document.getElementById('noCardsMessage');
+function showMessage(show, text) {
+  const messageCard = document.getElementById('messageCard');
+  const message = document.getElementById('message');
+
+  message.innerHTML = text;
 
   if (show) {
-    noCardsMessage.removeAttribute('style');
+    messageCard.removeAttribute('style');
   } else {
-    noCardsMessage.style.display = 'none';
+    messageCard.style.display = 'none';
   }
 }
 
@@ -178,6 +180,8 @@ function displayPercentage(number) {
  * Optionally, the user may select more ("tertiary") indicators to display on each card as well.
  */
 function createIncreaseCards(minYear, maxYear) {
+  removeCards();
+
   const cardsContainer = document.getElementById('cardsContainer');
 
   const primaryIndicatorRadioButtons = Array.from(document.getElementsByClassName('primaryIndicatorRadioButton'));
@@ -193,6 +197,8 @@ function createIncreaseCards(minYear, maxYear) {
   if (!primaryIndicatorRadioButtonChecked) {
     return;
   }
+
+  showMessage(true, 'Please wait...');
 
   const tertiaryIndicatorCheckboxesChecked = Array.from(document.getElementsByClassName('tertiaryIndicatorCheckbox'))
     .filter((tertiaryIndicatorCheckbox) => tertiaryIndicatorCheckbox.checked);
@@ -213,9 +219,9 @@ function createIncreaseCards(minYear, maxYear) {
       removeCards();
 
       if (primaryIndicatorTuples.length > 0) {
-        showNoCardsMessage(false);
+        showMessage(false, '');
       } else {
-        showNoCardsMessage(true);
+        showMessage(true, 'No cards to display');
       }
 
       // For each tuple in the primary indicator data, create a card.
@@ -339,6 +345,8 @@ function createIncreaseCards(minYear, maxYear) {
  * Displays a card with this data for each country, sorted by magnitude in descending order.
  */
 function createYoyCards(minYear, maxYear) {
+  removeCards();
+
   const cardsContainer = document.getElementById('cardsContainer');
 
   const primaryIndicatorRadioButtons = Array.from(document.getElementsByClassName('primaryIndicatorRadioButton'));
@@ -355,6 +363,8 @@ function createYoyCards(minYear, maxYear) {
     return;
   }
 
+  showMessage(true, 'Please wait...');
+
   const primaryIndicatorCode = primaryIndicatorRadioButtonChecked.getAttribute('code');
   const primaryIndicatorName = primaryIndicatorRadioButtonChecked.getAttribute('callsign');
 
@@ -367,9 +377,9 @@ function createYoyCards(minYear, maxYear) {
       removeCards();
 
       if (tuples.length > 0) {
-        showNoCardsMessage(false);
+        showMessage(false, '');
       } else {
-        showNoCardsMessage(true);
+        showMessage(true, 'No cards to display');
       }
 
       // For each tuple in the data, create a card.
@@ -408,6 +418,8 @@ function createYoyCards(minYear, maxYear) {
  * That is, it computes the change in the ratio between the primary indicator (the numerator) and the secondary indicator (the denominator).
  */
 function createYoyPairsCards(minYear, maxYear) {
+  removeCards();
+
   const cardsContainer = document.getElementById('cardsContainer');
 
   const primaryIndicatorRadioButtons = Array.from(document.getElementsByClassName('primaryIndicatorRadioButton'));
@@ -438,6 +450,8 @@ function createYoyPairsCards(minYear, maxYear) {
     return;
   }
 
+  showMessage(true, 'Please wait...');
+
   // Numerator.
   const primaryIndicatorCode = primaryIndicatorRadioButtonChecked.getAttribute('code');
   const primaryIndicatorName = primaryIndicatorRadioButtonChecked.getAttribute('callsign');
@@ -455,9 +469,9 @@ function createYoyPairsCards(minYear, maxYear) {
       removeCards();
 
       if (tuples.length > 0) {
-        showNoCardsMessage(false);
+        showMessage(false, '');
       } else {
-        showNoCardsMessage(true);
+        showMessage(true, 'No cards to display');
       }
 
       // For each tuple in the data, create a card.

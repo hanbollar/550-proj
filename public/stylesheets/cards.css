@@ -30,7 +30,7 @@ h4 {
   flex-wrap: wrap;
 }
 
-#noCardsContainer {
+#messageContainer {
   display: flex;
   flex-direction: row;
   flex: 0 1 100%;
@@ -38,7 +38,7 @@ h4 {
   flex-wrap: wrap;
 }
 
-#noCardsMessage {
+#messageCard {
   width: 80%;
   height: 400px;
 }
