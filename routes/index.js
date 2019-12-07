@@ -174,7 +174,7 @@ router.get('/yoyTuples/:indicator/:minYear/:maxYear', (req, res) => {
  *
  * For the selected indicator, computes the largest
  * relative year-over-year change in that indicator for each country.
- * That is, it computes the change in ratio between
+ * That is, it computes the change in the ratio between
  * the primary indicator (the numerator) and the secondary indicator (the denominator).
  */
 router.get('/yoyPairTuples/:indicatorNumerator/:indicatorDenominator/:minYear/:maxYear', (req, res) => {

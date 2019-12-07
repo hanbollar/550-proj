@@ -117,7 +117,8 @@ function updateView() {
   // At least one indicator is selected.
   // Compute and display average completeness percentages.
   const completenessMap = new Map();
-  const count = indicatorCheckboxesChecked.length;
+  const numIndicators = indicatorCheckboxesChecked.length;
+  let numCompletenessesProcessed = 0;
   indicatorCheckboxesChecked.forEach((indicatorCheckbox) => {
     const indicatorCode = indicatorCheckbox.getAttribute('code');
 
@@ -127,6 +128,8 @@ function updateView() {
     fetch(url)
       .then((res) => res.json())
       .then((json) => {
+        numCompletenessesProcessed += 1;
+
         json.forEach((tuple) => {
           const countryName = tuple.name;
           const completenessForIndicator = Number(tuple.completeness);
@@ -140,8 +143,8 @@ function updateView() {
           const newTotal = mapValue.total + completenessForIndicator;
           let newAverage;
 
-          if (count !== 0) {
-            newAverage = newTotal / count;
+          if (numIndicators !== 0) {
+            newAverage = newTotal / numIndicators;
           } else {
             newAverage = 0;
           }
@@ -151,19 +154,21 @@ function updateView() {
             average: newAverage,
           });
         });
-      })
-      // Display average completeness data for all indicators.
-      .then(() => {
-        countryCompletenesses.forEach((countryCompleteness) => {
-          const countryName = countryCompleteness.getAttribute('callsign');
-          const newCountryCompleteness = countryCompleteness;
 
-          if (completenessMap.has(countryName)) {
-            newCountryCompleteness.innerHTML = `${Math.round(completenessMap.get(countryName).average * 100)}`;
-          } else {
-            newCountryCompleteness.innerHTML = '';
-          }
-        });
+        // If all server requests have completed,
+        // display average completeness data for all indicators.
+        if (numCompletenessesProcessed >= numIndicators) {
+          countryCompletenesses.forEach((countryCompleteness) => {
+            const countryName = countryCompleteness.getAttribute('callsign');
+            const newCountryCompleteness = countryCompleteness;
+
+            if (completenessMap.has(countryName)) {
+              newCountryCompleteness.innerHTML = `${Math.round(completenessMap.get(countryName).average * 100)}`;
+            } else {
+              newCountryCompleteness.innerHTML = '';
+            }
+          });
+        }
       });
   });
 
