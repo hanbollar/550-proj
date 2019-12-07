@@ -47,11 +47,17 @@ function updateView() {
   // Call the correct card-creator function for the selected mode
   // (i.e., increase, yoy, or yoyPairs).
   if (mode === 'increase') {
-    createIncreaseCards(minYear, maxYear);
+    createIncreaseCards(minYear, maxYear, false);
+  } else if (mode === 'increaseInvert') {
+    createIncreaseCards(minYear, maxYear, true);
   } else if (mode === 'yoy') {
-    createYoyCards(minYear, maxYear);
+    createYoyCards(minYear, maxYear, false);
+  } else if (mode === 'yoyInvert') {
+    createYoyCards(minYear, maxYear, true);
   } else if (mode === 'yoyPairs') {
-    createYoyPairsCards(minYear, maxYear);
+    createYoyPairsCards(minYear, maxYear, false);
+  } else if (mode === 'yoyPairsInvert') {
+    createYoyPairsCards(minYear, maxYear, true);
   }
 }
 
@@ -112,21 +118,21 @@ function resetControls() {
 
   // Display the correct indicator controls for the selected mode
   // (i.e., increase, yoy, or yoyPairs).
-  if (mode === 'increase') {
+  if (mode === 'increase' || mode === 'increaseInvert') {
     primaryIndicatorControls.removeAttribute('style');
     secondaryIndicatorControls.style.display = 'none';
     tertiaryIndicatorControls.removeAttribute('style');
 
     primaryIndicatorSearchFilter.placeholder = 'Filter primary indicators...';
     tertiaryIndicatorSearchFilter.placeholder = 'Filter secondary indicators...';
-  } else if (mode === 'yoy') {
+  } else if (mode === 'yoy' || mode === 'yoyInvert') {
     primaryIndicatorControls.removeAttribute('style');
     primaryIndicatorControls.style.width = '100%';
     secondaryIndicatorControls.style.display = 'none';
     tertiaryIndicatorControls.style.display = 'none';
 
     primaryIndicatorSearchFilter.placeholder = 'Filter indicators...';
-  } else if (mode === 'yoyPairs') {
+  } else if (mode === 'yoyPairs' || mode === 'yoyPairsInvert') {
     primaryIndicatorControls.removeAttribute('style');
     secondaryIndicatorControls.removeAttribute('style');
     tertiaryIndicatorControls.style.display = 'none';
@@ -177,9 +183,13 @@ function displayPercentage(number) {
  * for every country in the dataset over the selected time range.
  * Sorts the cards by the magnitude in descending order.
  *
+ * If the "invert" parameter is true, orders the results
+ * so that the largest negative changes are on top,
+ * instead of the largest positive ones.
+ *
  * Optionally, the user may select more ("tertiary") indicators to display on each card as well.
  */
-function createIncreaseCards(minYear, maxYear) {
+function createIncreaseCards(minYear, maxYear, invert) {
   removeCards();
 
   const cardsContainer = document.getElementById('cardsContainer');
@@ -209,7 +219,7 @@ function createIncreaseCards(minYear, maxYear) {
   const cardsMap = new Map();
   const tertiaryIndicatorTables = [];
 
-  let url = `/increaseTuples/${primaryIndicatorCode}/${minYear}/${maxYear}`;
+  let url = `/increaseTuples/${primaryIndicatorCode}/${minYear}/${maxYear}/${invert}`;
   const defaultImgSrc = '../assets/flag_images/blank.png';
 
   // Get data for the primary indicator.
@@ -244,6 +254,10 @@ function createIncreaseCards(minYear, maxYear) {
         const cardText = document.createElement('div');
         cardText.className = 'cardText';
         innerCard.appendChild(cardText);
+
+        if (tuple.name === 'Samoa') {
+          console.log(tuple.percentage_change);
+        }
 
         // We do not need to add tertiary data.
         // Display the card right away.
@@ -281,7 +295,7 @@ function createIncreaseCards(minYear, maxYear) {
         // The data should only be displayed once all server requests complete.
         const newTertiaryIndicatorTable = { indicatorName: tertiaryIndicatorName, tuples: [] };
 
-        url = `/increaseTuples/${tertiaryIndicatorCode}/${minYear}/${maxYear}`;
+        url = `/increaseTuples/${tertiaryIndicatorCode}/${minYear}/${maxYear}/${invert}`;
 
         // Get data for the tertiary indicator.
         fetch(url)
@@ -341,10 +355,14 @@ function createIncreaseCards(minYear, maxYear) {
 /**
  * Updates the view if the mode is set to "yoy."
  *
- * For the selected indicator, computes the largest year-over-year change in that indicator for each country.
+ * For the selected indicator, computes the largest year-over-year changes
+ * in that indicator for each country.
  * Displays a card with this data for each country, sorted by magnitude in descending order.
+ *
+ * If the "invert" parameter is true, finds the largest negative year-over-year change
+ * instead of the largest positive one.
  */
-function createYoyCards(minYear, maxYear) {
+function createYoyCards(minYear, maxYear, invert) {
   removeCards();
 
   const cardsContainer = document.getElementById('cardsContainer');
@@ -368,7 +386,7 @@ function createYoyCards(minYear, maxYear) {
   const primaryIndicatorCode = primaryIndicatorRadioButtonChecked.getAttribute('code');
   const primaryIndicatorName = primaryIndicatorRadioButtonChecked.getAttribute('callsign');
 
-  const url = `/yoyTuples/${primaryIndicatorCode}/${minYear}/${maxYear}`;
+  const url = `/yoyTuples/${primaryIndicatorCode}/${minYear}/${maxYear}/${invert}`;
   const defaultImgSrc = '../assets/flag_images/blank.png';
 
   fetch(url)
@@ -414,10 +432,15 @@ function createYoyCards(minYear, maxYear) {
 /**
  * Updates the view if the mode is set to "yoyPairs."
  *
- * For the selected indicator, computes the largest relative year-over-year change in that indicator for each country.
- * That is, it computes the change in the ratio between the primary indicator (the numerator) and the secondary indicator (the denominator).
+ * For the selected indicator, computes the largest
+ * relative year-over-year change in that indicator for each country.
+ * That is, it computes the change in the ratio between
+ * the primary indicator (the numerator) and the secondary indicator (the denominator).
+ *
+ * If the "invert" parameter is true, finds the largest negative year-over-year change
+ * instead of the largest positive one.
  */
-function createYoyPairsCards(minYear, maxYear) {
+function createYoyPairsCards(minYear, maxYear, invert) {
   removeCards();
 
   const cardsContainer = document.getElementById('cardsContainer');
@@ -460,7 +483,7 @@ function createYoyPairsCards(minYear, maxYear) {
   const secondaryIndicatorCode = secondaryIndicatorRadioButtonChecked.getAttribute('code');
   const secondaryIndicatorName = secondaryIndicatorRadioButtonChecked.getAttribute('callsign');
 
-  const url = `/yoyPairTuples/${primaryIndicatorCode}/${secondaryIndicatorCode}/${minYear}/${maxYear}`;
+  const url = `/yoyPairTuples/${primaryIndicatorCode}/${secondaryIndicatorCode}/${minYear}/${maxYear}/${invert}`;
   const defaultImgSrc = '../assets/flag_images/blank.png';
 
   fetch(url)

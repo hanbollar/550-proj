@@ -26,10 +26,13 @@
             <div class="input-group-prepend">
               <label class="input-group-text" for="modeDropdown">Select mode:</label>
             </div>
-            <select class="custom-select" id="modeDropdown" onchange="resetControls(); removeCards();">
+            <select class="custom-select" id="modeDropdown" onchange="resetControls(); filterPrimaryIndicatorBoxes(); filterSecondaryIndicatorBoxes(); filterTertiaryIndicatorBoxes(); removeCards();">
               <option value="increase">Greatest increase over time range</option>
+              <option value="increaseInvert">Greatest decrease over time range</option>
               <option value="yoy">Greatest year-over-year increase within time range</option>
+              <option value="yoyInvert">Greatest year-over-year decrease within time range</option>
               <option value="yoyPairs">Greatest year-over-year relative increase within time range</option>
+              <option value="yoyPairsInvert">Greatest year-over-year relative decrease within time range</option>
             </select>
           </div>
     

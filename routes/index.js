@@ -59,14 +59,21 @@ router.get('/indicatorTuples', (req, res) => {
  * For the selected primary indicator, determines the magnitude of the change
  * for every country in the dataset over the selected time range.
  * Sorts the cards by the magnitude in descending order.
+ *
+ * If the "invert" parameter is true, orders the results
+ * so that the largest negative changes are on top,
+ * instead of the largest positive ones.
  */
-router.get('/increaseTuples/:indicator/:minYear/:maxYear', (req, res) => {
+router.get('/increaseTuples/:indicator/:minYear/:maxYear/:invert', (req, res) => {
   if (!req.params.indicator || req.params.indicator === '') { res.sendStatus(400); return; }
   if (!req.params.minYear || req.params.minYear === '') { res.sendStatus(400); return; }
   if (!req.params.maxYear || req.params.maxYear === '') { res.sendStatus(400); return; }
+  if (!req.params.invert || !(req.params.invert === 'true' || req.params.invert === 'false')) { res.sendStatus(400); return; }
   if (req.params.minYear > req.params.maxYear) { res.sendStatus(400); return; }
 
-  const query = `
+  const invert = (req.params.invert === 'true');
+
+  let query = `
     WITH values_for_countries AS (
       SELECT    i.cid,
                 i.year,
@@ -98,12 +105,13 @@ router.get('/increaseTuples/:indicator/:minYear/:maxYear', (req, res) => {
       WHERE     (vfc.cid, vfc.year) IN (SELECT * FROM max_year_per_country) ),
     change_per_country AS (
       SELECT    svpc.cid,
-                svpc.year                                    AS start_year,
-                evpc.year                                    AS end_year,
-                ( ( evpc.value - svpc.value ) / svpc.value ) AS percentage_change
+                svpc.year                                   AS start_year,
+                evpc.year                                   AS end_year,
+                ((evpc.value - svpc.value) / svpc.value)    AS percentage_change
       FROM      start_values_per_country svpc
       JOIN      end_values_per_country evpc
-      ON        evpc.cid = svpc.cid )
+      ON        evpc.cid = svpc.cid
+      WHERE     svpc.value <> 0 )
     SELECT  c.name,
             cpc.start_year,
             cpc.end_year,
@@ -111,7 +119,15 @@ router.get('/increaseTuples/:indicator/:minYear/:maxYear', (req, res) => {
     FROM     change_per_country cpc
     JOIN     Country c
     ON       c.cid = cpc.cid
-    ORDER BY cpc.percentage_change DESC;`;
+    ORDER BY cpc.percentage_change`;
+
+  if (invert) {
+    query += ';';
+  } else {
+    query += ' DESC;';
+  }
+
+  console.log(query);
 
   connection.query(query, (err, rows) => {
     if (err) console.log(`[!] /increaseTuples route: ${err}`);
@@ -127,14 +143,20 @@ router.get('/increaseTuples/:indicator/:minYear/:maxYear', (req, res) => {
  * For the selected indicator, computes the largest year-over-year changes
  * in that indicator for each country.
  * Displays a card with this data for each country, sorted by magnitude in descending order.
+ *
+ * If the "invert" parameter is true, finds the largest negative year-over-year change
+ * instead of the largest positive one.
  */
-router.get('/yoyTuples/:indicator/:minYear/:maxYear', (req, res) => {
+router.get('/yoyTuples/:indicator/:minYear/:maxYear/:invert', (req, res) => {
   if (!req.params.indicator || req.params.indicator === '') { res.sendStatus(400); return; }
   if (!req.params.minYear || req.params.minYear === '') { res.sendStatus(400); return; }
   if (!req.params.maxYear || req.params.maxYear === '') { res.sendStatus(400); return; }
+  if (!req.params.invert || !(req.params.invert === 'true' || req.params.invert === 'false')) { res.sendStatus(400); return; }
   if (req.params.minYear > req.params.maxYear) { res.sendStatus(400); return; }
 
-  const query = `
+  const invert = (req.params.invert === 'true');
+
+  let query = `
     WITH year_over_year_changes AS (
       SELECT    istart.cid,
                 istart.year                                      AS start_year,
@@ -145,7 +167,9 @@ router.get('/yoyTuples/:indicator/:minYear/:maxYear', (req, res) => {
       ON        iend.cid = istart.cid
       WHERE     iend.year = istart.year + 1
       AND       istart.year >= ${req.params.minYear}
-      AND       istart.year < ${req.params.maxYear} ),    
+      AND       istart.year < ${req.params.maxYear}
+      AND       istart.value <> 0
+      HAVING    abs(percentage_change) > 1e-6 ),
     max_change_per_country AS (
       SELECT    yoyc1.cid,
                 yoyc1.start_year,
@@ -154,8 +178,16 @@ router.get('/yoyTuples/:indicator/:minYear/:maxYear', (req, res) => {
       FROM      year_over_year_changes yoyc1
       LEFT JOIN year_over_year_changes yoyc2
       ON        yoyc1.cid = yoyc2.cid
-      AND       yoyc1.percentage_change < yoyc2.percentage_change
-      WHERE     yoyc2.percentage_change IS NULL )
+      `;
+
+  if (invert) {
+    query += 'AND       yoyc1.percentage_change > yoyc2.percentage_change';
+  } else {
+    query += 'AND       yoyc1.percentage_change < yoyc2.percentage_change';
+  }
+
+  query += `
+    WHERE     yoyc2.percentage_change IS NULL )
     SELECT    c.name,
               mcpc.start_year,
               mcpc.end_year,
@@ -163,7 +195,15 @@ router.get('/yoyTuples/:indicator/:minYear/:maxYear', (req, res) => {
     FROM      max_change_per_country mcpc
     JOIN      Country c
     ON        c.cid = mcpc.cid
-    ORDER BY  mcpc.percentage_change DESC;`;
+    ORDER BY  mcpc.percentage_change`;
+
+  if (invert) {
+    query += ';';
+  } else {
+    query += ' DESC;';
+  }
+
+  console.log(query);
 
   connection.query(query, (err, rows) => {
     if (err) console.log(`[!] /yoyTuples route: ${err}`);
@@ -180,15 +220,21 @@ router.get('/yoyTuples/:indicator/:minYear/:maxYear', (req, res) => {
  * relative year-over-year change in that indicator for each country.
  * That is, it computes the change in the ratio between
  * the primary indicator (the numerator) and the secondary indicator (the denominator).
+ *
+ * If the "invert" parameter is true, finds the largest negative year-over-year change
+ * instead of the largest positive one.
  */
-router.get('/yoyPairTuples/:indicatorNumerator/:indicatorDenominator/:minYear/:maxYear', (req, res) => {
+router.get('/yoyPairTuples/:indicatorNumerator/:indicatorDenominator/:minYear/:maxYear/:invert', (req, res) => {
   if (!req.params.indicatorNumerator || req.params.indicatorNumerator === '') { res.sendStatus(400); return; }
   if (!req.params.indicatorDenominator || req.params.indicatorDenominator === '') { res.sendStatus(400); return; }
   if (!req.params.minYear || req.params.minYear === '') { res.sendStatus(400); return; }
   if (!req.params.maxYear || req.params.maxYear === '') { res.sendStatus(400); return; }
+  if (!req.params.invert || !(req.params.invert === 'true' || req.params.invert === 'false')) { res.sendStatus(400); return; }
   if (req.params.minYear > req.params.maxYear) { res.sendStatus(400); return; }
 
-  const query = `
+  const invert = (req.params.invert === 'true');
+
+  let query = `
     WITH year_over_year_changes AS (
       SELECT    i1start.cid,
                 i1start.year    AS start_year,
@@ -205,7 +251,9 @@ router.get('/yoyPairTuples/:indicatorNumerator/:indicatorDenominator/:minYear/:m
       AND       i1end.year = i2end.year
       AND       i1end.year = i1start.year + 1
       AND       i1start.year >= ${req.params.minYear}
-      AND       i1start.year < ${req.params.maxYear} ),
+      AND       i1start.year < ${req.params.maxYear}
+      AND       (i1start.value / i2start.value) <> 0
+      HAVING    abs(percentage_change) > 1e-6 ),
     max_change_per_country AS (
       SELECT    yoyc1.cid,
                 yoyc1.start_year,
@@ -214,8 +262,16 @@ router.get('/yoyPairTuples/:indicatorNumerator/:indicatorDenominator/:minYear/:m
       FROM      year_over_year_changes yoyc1
       LEFT JOIN year_over_year_changes yoyc2
       ON        yoyc1.cid = yoyc2.cid
-      AND       yoyc1.percentage_change < yoyc2.percentage_change
-      WHERE     yoyc2.percentage_change IS NULL )
+      `;
+
+  if (invert) {
+    query += 'AND       yoyc1.percentage_change > yoyc2.percentage_change';
+  } else {
+    query += 'AND       yoyc1.percentage_change < yoyc2.percentage_change';
+  }
+
+  query += `
+    WHERE     yoyc2.percentage_change IS NULL )
     SELECT    c.name,
               mcpc.start_year,
               mcpc.end_year,
@@ -223,7 +279,15 @@ router.get('/yoyPairTuples/:indicatorNumerator/:indicatorDenominator/:minYear/:m
     FROM      max_change_per_country mcpc
     JOIN      Country c
     ON        c.cid = mcpc.cid
-    ORDER BY  mcpc.percentage_change DESC;`;
+    ORDER BY  mcpc.percentage_change`;
+
+  if (invert) {
+    query += ';';
+  } else {
+    query += ' DESC;';
+  }
+
+  console.log(query);
 
   connection.query(query, (err, rows) => {
     if (err) console.log(`[!] /yoyPairTuples route: ${err}`);
