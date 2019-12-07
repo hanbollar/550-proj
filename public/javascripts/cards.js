@@ -76,6 +76,13 @@ function removeCards() {
 }
 
 /**
+ * Converts a country's name to the image name of its flag.
+ */
+function convertToFlagFilename(countryName) {
+  return `../assets/flag_images/${countryName.replace(/[: ]+/g, '').toLowerCase()}.png`;
+}
+
+/**
  * Resets the user controls to their default state.
  * Search filters are cleared, checkboxes are unchecked, etc.
  *
@@ -245,8 +252,7 @@ function createIncreaseCards(minYear, maxYear, invert) {
         outerCard.appendChild(innerCard);
 
         const image = document.createElement('img');
-        const src = `../assets/flag_images/${tuple.name.split(' ').join('').toLowerCase()}.png`;
-        image.src = src;
+        image.src = convertToFlagFilename(tuple.name);
         image.onerror = () => { image.src = defaultImgSrc; };
         image.className = 'flag';
         innerCard.appendChild(image);
@@ -411,8 +417,7 @@ function createYoyCards(minYear, maxYear, invert) {
         outerCard.appendChild(innerCard);
 
         const image = document.createElement('img');
-        const src = `../assets/flag_images/${tuple.name.split(' ').join('').toLowerCase()}.png`;
-        image.src = src;
+        image.src = convertToFlagFilename(tuple.name);
         image.onerror = () => { image.src = defaultImgSrc; };
         image.className = 'flag';
         innerCard.appendChild(image);
@@ -508,8 +513,7 @@ function createYoyPairsCards(minYear, maxYear, invert) {
         outerCard.appendChild(innerCard);
 
         const image = document.createElement('img');
-        const src = `../assets/flag_images/${tuple.name.split(' ').join('').toLowerCase()}.png`;
-        image.src = src;
+        image.src = convertToFlagFilename(tuple.name);
         image.onerror = () => { image.src = defaultImgSrc; };
         image.className = 'flag';
         innerCard.appendChild(image);
