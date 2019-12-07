@@ -40,7 +40,7 @@ router.get('/countryTuples', (req, res) => {
 
 router.get('/indicatorTuples', (req, res) => {
   const query = `
-    SELECT *
+    SELECT i.code, i.name
     FROM Indicator i
     WHERE table_exists
     ORDER BY i.name;`;
@@ -74,22 +74,28 @@ router.get('/increaseTuples/:indicator/:minYear/:maxYear', (req, res) => {
       FROM      ${req.params.indicator} i
       WHERE     i.year >= ${req.params.minYear}
       AND       i.year <= ${req.params.maxYear} ),
+    min_year_per_country AS (
+      SELECT    vfc.cid,
+                min(vfc.year)
+      FROM      values_for_countries vfc
+      GROUP BY  vfc.cid ),
+    max_year_per_country AS (
+      SELECT    vfc.cid,
+                max(vfc.year)
+      FROM      values_for_countries vfc
+      GROUP BY  vfc.cid ),
     start_values_per_country AS (
-      SELECT    vfc1.cid,
-                vfc1.year,
-                vfc1.value
-      FROM      values_for_countries vfc1
-      WHERE     vfc1.year <= ALL (SELECT vfc2.year
-                                  FROM values_for_countries vfc2
-                                  WHERE vfc2.cid = vfc1.cid) ),
+      SELECT    vfc.cid,
+                vfc.year,
+                vfc.value
+      FROM      values_for_countries vfc
+      WHERE     (vfc.cid, vfc.year) IN (SELECT * FROM min_year_per_country) ),
     end_values_per_country AS (
-      SELECT    vfc1.cid,
-                vfc1.year,
-                vfc1.value
-      FROM      values_for_countries vfc1
-      WHERE     vfc1.year >= ALL (SELECT vfc2.year
-                                  FROM values_for_countries vfc2
-                                  WHERE vfc2.cid = vfc1.cid) ),
+      SELECT    vfc.cid,
+                vfc.year,
+                vfc.value
+      FROM      values_for_countries vfc
+      WHERE     (vfc.cid, vfc.year) IN (SELECT * FROM max_year_per_country) ),
     change_per_country AS (
       SELECT    svpc.cid,
                 svpc.year                                    AS start_year,
