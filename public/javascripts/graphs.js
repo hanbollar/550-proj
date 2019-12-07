@@ -54,8 +54,17 @@ function constructGraph(graphMap, indicatorName) {
     });
   });
 
+  let title = indicatorName;
+
+  if (title.length > 20) {
+    const yAxis = title.split(' ');
+    const interval = title.split(' ').length / 2;
+
+    title = `${yAxis.slice(0, interval).join(' ')}<br>${yAxis.slice(interval, yAxis.length).join(' ')}`;
+  }
+
   const layout = {
-    title: indicatorName,
+    title,
   };
 
   return { dataSeries, layout };

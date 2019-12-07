@@ -61,7 +61,7 @@ h4 {
   width: 90%;
   height: 90%;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: space-between;
   margin: 10px;
   overflow: hidden;
 }
