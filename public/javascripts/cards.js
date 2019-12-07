@@ -261,10 +261,6 @@ function createIncreaseCards(minYear, maxYear, invert) {
         cardText.className = 'cardText';
         innerCard.appendChild(cardText);
 
-        if (tuple.name === 'Samoa') {
-          console.log(tuple.percentage_change);
-        }
-
         // We do not need to add tertiary data.
         // Display the card right away.
         if (tertiaryIndicatorCheckboxesChecked.length === 0) {
