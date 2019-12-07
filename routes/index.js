@@ -127,8 +127,6 @@ router.get('/increaseTuples/:indicator/:minYear/:maxYear/:invert', (req, res) =>
     query += ' DESC;';
   }
 
-  console.log(query);
-
   connection.query(query, (err, rows) => {
     if (err) console.log(`[!] /increaseTuples route: ${err}`);
     else {
@@ -202,8 +200,6 @@ router.get('/yoyTuples/:indicator/:minYear/:maxYear/:invert', (req, res) => {
   } else {
     query += ' DESC;';
   }
-
-  console.log(query);
 
   connection.query(query, (err, rows) => {
     if (err) console.log(`[!] /yoyTuples route: ${err}`);
@@ -286,8 +282,6 @@ router.get('/yoyPairTuples/:indicatorNumerator/:indicatorDenominator/:minYear/:m
   } else {
     query += ' DESC;';
   }
-
-  console.log(query);
 
   connection.query(query, (err, rows) => {
     if (err) console.log(`[!] /yoyPairTuples route: ${err}`);
