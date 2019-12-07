@@ -165,8 +165,6 @@ router.get('/yoyTuples/:indicator/:minYear/:maxYear', (req, res) => {
     ON        c.cid = mcpc.cid
     ORDER BY  mcpc.percentage_change DESC;`;
 
-  console.log(query);
-
   connection.query(query, (err, rows) => {
     if (err) console.log(`[!] /yoyTuples route: ${err}`);
     else {
@@ -226,8 +224,6 @@ router.get('/yoyPairTuples/:indicatorNumerator/:indicatorDenominator/:minYear/:m
     JOIN      Country c
     ON        c.cid = mcpc.cid
     ORDER BY  mcpc.percentage_change DESC;`;
-
-  console.log(query);
 
   connection.query(query, (err, rows) => {
     if (err) console.log(`[!] /yoyPairTuples route: ${err}`);
