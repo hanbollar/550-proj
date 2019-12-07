@@ -124,7 +124,7 @@ router.get('/increaseTuples/:indicator/:minYear/:maxYear', (req, res) => {
 /**
  * Returns data for the "yoy" mode of the "cards" page.
  *
- * For the selected indicator, computes the largest year-over-year change
+ * For the selected indicator, computes the largest year-over-year changes
  * in that indicator for each country.
  * Displays a card with this data for each country, sorted by magnitude in descending order.
  */
@@ -136,30 +136,36 @@ router.get('/yoyTuples/:indicator/:minYear/:maxYear', (req, res) => {
 
   const query = `
     WITH year_over_year_changes AS (
-      SELECT  istart.cid,
-              istart.year                                      AS start_year,
-              iend.year                                        AS end_year,
-              ((iend.value - istart.value) / istart.value)     AS percentage_change
-      FROM    ${req.params.indicator} istart
-      JOIN    ${req.params.indicator} iend
-      ON      iend.cid = istart.cid
-      WHERE   iend.year = istart.year + 1
-      AND     istart.year >= ${req.params.minYear}
-      AND     istart.year <= ${req.params.maxYear}
-      AND     iend.year >= ${req.params.minYear}
-      AND     iend.year <= ${req.params.maxYear} )
+      SELECT    istart.cid,
+                istart.year                                      AS start_year,
+                iend.year                                        AS end_year,
+                ((iend.value - istart.value) / istart.value)     AS percentage_change
+      FROM      ${req.params.indicator} istart
+      JOIN      ${req.params.indicator} iend
+      ON        iend.cid = istart.cid
+      WHERE     iend.year = istart.year + 1
+      AND       istart.year >= ${req.params.minYear}
+      AND       istart.year < ${req.params.maxYear} ),    
+    max_change_per_country AS (
+      SELECT    yoyc1.cid,
+                yoyc1.start_year,
+                yoyc1.end_year,
+                yoyc1.percentage_change
+      FROM      year_over_year_changes yoyc1
+      LEFT JOIN year_over_year_changes yoyc2
+      ON        yoyc1.cid = yoyc2.cid
+      AND       yoyc1.percentage_change < yoyc2.percentage_change
+      WHERE     yoyc2.percentage_change IS NULL )
     SELECT    c.name,
-              yoyc.start_year,
-              yoyc.end_year,
-              max(yoyc.percentage_change) AS percentage_change
-    FROM      year_over_year_changes yoyc
+              mcpc.start_year,
+              mcpc.end_year,
+              mcpc.percentage_change
+    FROM      max_change_per_country mcpc
     JOIN      Country c
-    ON        c.cid = yoyc.cid
-    GROUP BY  yoyc.cid,
-              yoyc.percentage_change,
-              yoyc.start_year,
-              yoyc.end_year
-    ORDER BY  yoyc.percentage_change DESC;`;
+    ON        c.cid = mcpc.cid
+    ORDER BY  mcpc.percentage_change DESC;`;
+
+  console.log(query);
 
   connection.query(query, (err, rows) => {
     if (err) console.log(`[!] /yoyTuples route: ${err}`);
@@ -201,20 +207,27 @@ router.get('/yoyPairTuples/:indicatorNumerator/:indicatorDenominator/:minYear/:m
       AND       i1end.year = i2end.year
       AND       i1end.year = i1start.year + 1
       AND       i1start.year >= ${req.params.minYear}
-      AND       i1start.year <= ${req.params.maxYear}
-      AND       i1end.year >= ${req.params.minYear}
-      AND       i1end.year <= ${req.params.maxYear} )
+      AND       i1start.year < ${req.params.maxYear} ),
+    max_change_per_country AS (
+      SELECT    yoyc1.cid,
+                yoyc1.start_year,
+                yoyc1.end_year,
+                yoyc1.percentage_change
+      FROM      year_over_year_changes yoyc1
+      LEFT JOIN year_over_year_changes yoyc2
+      ON        yoyc1.cid = yoyc2.cid
+      AND       yoyc1.percentage_change < yoyc2.percentage_change
+      WHERE     yoyc2.percentage_change IS NULL )
     SELECT    c.name,
-              yoyc.start_year,
-              yoyc.end_year,
-              max(yoyc.percentage_change) AS percentage_change
-    FROM      year_over_year_changes yoyc
+              mcpc.start_year,
+              mcpc.end_year,
+              mcpc.percentage_change
+    FROM      max_change_per_country mcpc
     JOIN      Country c
-    ON        c.cid = yoyc.cid
-    GROUP BY  yoyc.cid,
-              yoyc.start_year,
-              yoyc.end_year
-    ORDER BY  yoyc.percentage_change DESC;`;
+    ON        c.cid = mcpc.cid
+    ORDER BY  mcpc.percentage_change DESC;`;
+
+  console.log(query);
 
   connection.query(query, (err, rows) => {
     if (err) console.log(`[!] /yoyPairTuples route: ${err}`);
