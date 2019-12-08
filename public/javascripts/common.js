@@ -45,7 +45,7 @@ function updateSliderLabels() {
  */
 function populateNavBar() {
   const nav = document.getElementById('nav');
-  nav.className = 'navbar navbar-expand-lg navbar-light bg-light';
+  nav.className = 'navbar navbar-expand navbar-light bg-light';
 
   const title = document.createElement('span');
   title.className = 'navbar-brand center';
