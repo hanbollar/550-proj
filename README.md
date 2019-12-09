@@ -1,15 +1,7 @@
 # Instructions
 
-## Connecting to a Database
+## Running the App
 
-To connect to a database, add a file to the project's root directory named ``db-config.js`` and give it the following text (filling in the fields with the database's info):
-
-```
-module.exports = {
-	user: 'insert-user-name',
-	password: 'insert-password',
-	host: 'insert-host-name',
-	port: insert-port-number,
-	database: 'insert-database-name'
-};
-```
+1. Open a command terminal in the project's root directory
+2. Run the command ```npm start```
+3. Open a web browser and navigate to http://localhost:3000
