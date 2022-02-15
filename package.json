@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "acorn": "^7.1.1",
-    "angular": "^1.7.8",
+    "angular": "^1.8.0",
     "body-parser": "^1.19.0",
     "cookie-parser": "~1.4.3",
     "debug": "~2.6.3",
